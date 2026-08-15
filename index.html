@@ -9,20 +9,20 @@
     body { background-color: #0b0e14; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
   </style>
 </head>
-<body class="p-4 md:p-8">
+<body class="p-3 md:p-6">
 
   <!-- Header -->
   <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-800 gap-4">
     <div>
-      <h1 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+      <h1 class="text-xl md:text-2xl font-black tracking-tight text-white flex items-center gap-2">
         <span class="inline-block w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
         TradePulse AI Agent
       </h1>
-      <p class="text-xs text-gray-400 mt-1">Live Quantitative Scanner & Multi-Timeframe Pattern Recognition</p>
+      <p class="text-xs text-gray-400 mt-1">Autonomous Quantitative Scanner & Pattern Recognition</p>
     </div>
     <div class="flex items-center gap-3">
       <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1.5 rounded-full font-mono font-medium">● Bot Active (Telegram)</span>
-      <button onclick="refreshData()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-md font-medium transition">Refresh View</button>
+      <button onclick="loadLiveSignals()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-md font-medium transition">Sync Live Feed</button>
     </div>
   </header>
 
@@ -32,109 +32,109 @@
     <!-- Left / Center: Interactive TradingView Live Chart -->
     <div class="lg:col-span-2 bg-[#121824] rounded-xl border border-gray-800 p-4 flex flex-col h-[520px]">
       <div class="flex justify-between items-center mb-3">
-        <h2 class="text-sm font-semibold text-gray-300">Live Price Action (NSE / NIFTY 50)</h2>
-        <div class="flex gap-2">
-          <button onclick="loadTicker('NSE:RELIANCE')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-300">RELIANCE</button>
-          <button onclick="loadTicker('NSE:TCS')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-300">TCS</button>
-          <button onclick="loadTicker('NSE:HDFCBANK')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-300">HDFCBANK</button>
+        <h2 id="chart-title" class="text-sm font-semibold text-gray-300">Live Chart: NSE:RELIANCE</h2>
+        <div class="flex flex-wrap gap-1.5">
+          <button onclick="loadTicker('NSE:RELIANCE')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">RELIANCE</button>
+          <button onclick="loadTicker('NSE:TCS')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">TCS</button>
+          <button onclick="loadTicker('NSE:HDFCBANK')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">HDFCBANK</button>
+          <button onclick="loadTicker('NSE:ICICIBANK')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">ICICIBANK</button>
         </div>
       </div>
       
-      <!-- TradingView Widget Container -->
+      <!-- Live Chart Container -->
       <div id="tradingview_widget" class="flex-grow w-full rounded-lg overflow-hidden"></div>
     </div>
 
-    <!-- Right Column: AI Signals & Pattern Scanner Feed -->
+    <!-- Right Column: AI Signals & Technical Meter -->
     <div class="flex flex-col gap-6">
       
       <!-- Live Signals Log -->
       <div class="bg-[#121824] rounded-xl border border-gray-800 p-4">
         <h2 class="text-sm font-semibold text-gray-300 mb-3 flex items-center justify-between">
           <span>Recent AI Alerts</span>
-          <span class="text-xs text-gray-500 font-normal">Auto-Synced</span>
+          <span id="update-time" class="text-xs text-gray-500 font-normal">Auto-Synced</span>
         </h2>
-        <div class="space-y-3" id="signal-feed">
-          <div class="p-3 bg-[#182234] border-l-4 border-emerald-500 rounded-r-lg">
-            <div class="flex justify-between items-center text-xs font-bold">
-              <span class="text-emerald-400">🟢 BUY SETUP: TCS.NS</span>
-              <span class="text-gray-400">Today</span>
-            </div>
-            <p class="text-xs text-gray-300 mt-1">RSI reached 54.6 with price testing 200 EMA support. Bullish continuation favored.</p>
-          </div>
-
-          <div class="p-3 bg-[#182234] border-l-4 border-emerald-500 rounded-r-lg">
-            <div class="flex justify-between items-center text-xs font-bold">
-              <span class="text-emerald-400">🟢 BUY SETUP: HDFCBANK</span>
-              <span class="text-gray-400">Today</span>
-            </div>
-            <p class="text-xs text-gray-300 mt-1">Oversold rebound pattern detected. Stop loss calculated at 5% below entry.</p>
-          </div>
+        <div class="space-y-3 max-h-[220px] overflow-y-auto pr-1" id="signal-feed">
+          <p class="text-xs text-gray-500">Loading live signals...</p>
         </div>
       </div>
 
-      <!-- Live Technical Gauge -->
-      <div class="bg-[#121824] rounded-xl border border-gray-800 p-4 h-[240px]">
-        <h2 class="text-sm font-semibold text-gray-300 mb-2">Technical Meter</h2>
-        <div id="tradingview_technical" class="h-full w-full"></div>
+      <!-- Live Technical Analysis Gauge -->
+      <div class="bg-[#121824] rounded-xl border border-gray-800 p-4 h-[300px] flex flex-col">
+        <h2 class="text-sm font-semibold text-gray-300 mb-2">Technical Meter (NIFTY 50)</h2>
+        <div class="flex-grow w-full overflow-hidden">
+          <iframe 
+            src="https://s.tradingview.com/embed-widget/technical-analysis/?locale=en#%7B%22interval%22%3A%221D%22%2C%22width%22%3A%22100%25%22%2C%22isTransparent%22%3Atrue%2C%22height%22%3A%22100%25%22%2C%22symbol%22%3A%22NSE%3ANIFTY%22%2C%22showIntervalTabs%22%3Atrue%2C%22displayMode%22%3A%22single%22%2C%22colorTheme%22%3A%22dark%22%7D" 
+            style="width: 100%; height: 100%; border: none;">
+          </iframe>
+        </div>
       </div>
 
     </div>
   </div>
 
-  <!-- Scripts: TradingView Embedded Embeds -->
+  <!-- Scripts -->
   <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <script type="text/javascript">
-  let currentWidget = null;
+    let currentWidget = null;
 
-  function loadTicker(symbol) {
-    document.getElementById('tradingview_widget').innerHTML = '';
-    currentWidget = new TradingView.widget({
-      "autosize": true,
-      "symbol": symbol,
-      "interval": "D",
-      "timezone": "Asia/Kolkata",
-      "theme": "dark",
-      "style": "1",
-      "locale": "en",
-      "toolbar_bg": "#121824",
-      "enable_publishing": false,
-      "hide_side_toolbar": false,
-      "allow_symbol_change": true,
-      "container_id": "tradingview_widget"
-    });
-  }
-
-  loadTicker("NSE:RELIANCE");
-
-  async function loadLiveSignals() {
-    try {
-      const res = await fetch('./signals.json?t=' + new Date().getTime());
-      if (!res.ok) return;
-      const data = await res.json();
-      const feed = document.getElementById('signal-feed');
-      
-      if (!data.signals || data.signals.length === 0) {
-        feed.innerHTML = '<p class="text-xs text-gray-500">No active breakout/rebound setups right now.</p>';
-        return;
-      }
-
-      feed.innerHTML = data.signals.map(s => `
-        <div class="p-3 bg-[#182234] border-l-4 border-emerald-500 rounded-r-lg mb-3">
-          <div class="flex justify-between items-center text-xs font-bold">
-            <span class="text-emerald-400">🟢 BUY SETUP: ${s.ticker}</span>
-            <span class="text-gray-400 font-normal">${s.time}</span>
-          </div>
-          <p class="text-xs text-gray-300 mt-1 font-mono">Price: ₹${s.price} | RSI: ${s.rsi}</p>
-          <p class="text-xs text-gray-400 mt-1 leading-relaxed">${s.analysis}</p>
-        </div>
-      `).join('');
-    } catch (e) {
-      console.log("Awaiting feed update...");
+    function loadTicker(symbol) {
+      document.getElementById('chart-title').innerText = `Live Chart: ${symbol}`;
+      document.getElementById('tradingview_widget').innerHTML = '';
+      currentWidget = new TradingView.widget({
+        "autosize": true,
+        "symbol": symbol,
+        "interval": "D",
+        "timezone": "Asia/Kolkata",
+        "theme": "dark",
+        "style": "1",
+        "locale": "en",
+        "toolbar_bg": "#121824",
+        "enable_publishing": false,
+        "hide_side_toolbar": false,
+        "allow_symbol_change": true,
+        "container_id": "tradingview_widget"
+      });
     }
-  }
 
-  loadLiveSignals();
-</script>
+    // Default Load
+    loadTicker("NSE:RELIANCE");
 
+    async function loadLiveSignals() {
+      try {
+        const res = await fetch('./signals.json?t=' + new Date().getTime());
+        if (!res.ok) return;
+        const data = await res.json();
+        
+        if (data.last_updated) {
+          document.getElementById('update-time').innerText = data.last_updated;
+        }
+
+        const feed = document.getElementById('signal-feed');
+        if (!data.signals || data.signals.length === 0) {
+          feed.innerHTML = '<p class="text-xs text-gray-500">No active breakout/rebound setups right now.</p>';
+          return;
+        }
+
+        feed.innerHTML = data.signals.map(s => {
+          const cleanTicker = s.ticker.replace('.NS', '');
+          return `
+            <div onclick="loadTicker('NSE:${cleanTicker}')" class="p-3 bg-[#182234] hover:bg-[#1f2d44] cursor-pointer border-l-4 border-emerald-500 rounded-r-lg transition">
+              <div class="flex justify-between items-center text-xs font-bold">
+                <span class="text-emerald-400">🟢 BUY SETUP: ${s.ticker}</span>
+                <span class="text-gray-400 font-normal text-[10px]">${s.time.split(',')[1] || s.time}</span>
+              </div>
+              <p class="text-xs text-gray-300 mt-1 font-mono">Price: ₹${s.price} | RSI: ${s.rsi}</p>
+              <p class="text-xs text-gray-400 mt-1 text-[11px] leading-snug">${s.analysis}</p>
+            </div>
+          `;
+        }).join('');
+      } catch (e) {
+        console.log("Awaiting sync...");
+      }
+    }
+
+    loadLiveSignals();
+  </script>
 </body>
 </html>
