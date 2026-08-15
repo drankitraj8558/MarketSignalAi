@@ -32,12 +32,16 @@ def generate_ai_analysis(ticker, price, rsi, ema200, signal_type, macd_status):
         f"- MACD Status: {macd_status}\n\n"
         f"Give a concise 2-sentence trading thesis: 1. Core reason for the {signal_type}. 2. Specific Stop Loss and Target level."
     )
-    for model_name in ["gemini-2.0-flash", "gemini-1.5-flash"]:
+    
+    # Updated to prioritize Gemini 3.5 Flash and 3.1 Flash-Lite
+    for model_name in ["gemini-3.5-flash", "gemini-3.1-flash-lite", "gemini-2.5-flash"]:
         try:
             res = client.models.generate_content(model=model_name, contents=prompt)
             return res.text.strip()
-        except Exception:
+        except Exception as err:
+            print(f"Model {model_name} failed: {err}")
             continue
+            
     return f"{signal_type} trigger active at ₹{price} (RSI: {rsi})."
 
 def calculate_rsi(data, period=14):
