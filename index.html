@@ -3,65 +3,70 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TradePulse AI | Live Market Dashboard</title>
+  <title>TradePulse AI | Pro Market Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     body { background-color: #0b0e14; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-thumb { background: #1f293d; border-radius: 4px; }
   </style>
 </head>
 <body class="p-3 md:p-6">
 
-  <!-- Header -->
+  <!-- Top Navigation Header -->
   <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-800 gap-4">
     <div>
       <h1 class="text-xl md:text-2xl font-black tracking-tight text-white flex items-center gap-2">
         <span class="inline-block w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-        TradePulse AI Agent
+        TradePulse Pro AI
       </h1>
-      <p class="text-xs text-gray-400 mt-1">Autonomous Quantitative Scanner & Pattern Recognition</p>
+      <p class="text-xs text-gray-400 mt-0.5">Multi-Indicator Quantitative Screener (RSI, 200 EMA, MACD, Volume)</p>
     </div>
     <div class="flex items-center gap-3">
-      <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1.5 rounded-full font-mono font-medium">● Bot Active (Telegram)</span>
-      <button onclick="loadLiveSignals()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-md font-medium transition">Sync Live Feed</button>
+      <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1 rounded-full font-mono">● Auto-Cron Active</span>
+      <button onclick="loadLiveSignals()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-md font-medium transition">Sync Signals</button>
     </div>
   </header>
 
   <!-- Main Grid -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-    <!-- Left / Center: Interactive TradingView Live Chart -->
-    <div class="lg:col-span-2 bg-[#121824] rounded-xl border border-gray-800 p-4 flex flex-col h-[520px]">
-      <div class="flex justify-between items-center mb-3">
-        <h2 id="chart-title" class="text-sm font-semibold text-gray-300">Live Chart: NSE:RELIANCE</h2>
-        <div class="flex flex-wrap gap-1.5">
-          <button onclick="loadTicker('NSE:RELIANCE')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">RELIANCE</button>
-          <button onclick="loadTicker('NSE:TCS')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">TCS</button>
-          <button onclick="loadTicker('NSE:HDFCBANK')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">HDFCBANK</button>
-          <button onclick="loadTicker('NSE:ICICIBANK')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">ICICIBANK</button>
+    <!-- Left: TradingView Live Interactive Chart -->
+    <div class="lg:col-span-2 bg-[#121824] rounded-xl border border-gray-800 p-4 flex flex-col h-[560px]">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-2">
+        <h2 id="chart-title" class="text-xs font-bold uppercase tracking-wider text-emerald-400 font-mono">NSE:RELIANCE</h2>
+        <!-- Quick Stock Switcher Buttons -->
+        <div class="flex flex-wrap gap-1">
+          <button onclick="loadTicker('NSE:RELIANCE')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">RELIANCE</button>
+          <button onclick="loadTicker('NSE:TCS')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">TCS</button>
+          <button onclick="loadTicker('NSE:HDFCBANK')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">HDFCBANK</button>
+          <button onclick="loadTicker('NSE:ICICIBANK')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">ICICI</button>
+          <button onclick="loadTicker('NSE:SBIN')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">SBIN</button>
+          <button onclick="loadTicker('NSE:TATAMOTORS')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">TATAMOTORS</button>
         </div>
       </div>
       
-      <!-- Live Chart Container -->
-      <div id="tradingview_widget" class="flex-grow w-full rounded-lg overflow-hidden"></div>
+      <!-- Chart Embed -->
+      <div id="tradingview_widget" class="flex-grow w-full rounded-lg overflow-hidden border border-gray-800/60"></div>
     </div>
 
-    <!-- Right Column: AI Signals & Technical Meter -->
+    <!-- Right: Live AI Signals & Technical Meter -->
     <div class="flex flex-col gap-6">
       
-      <!-- Live Signals Log -->
+      <!-- Real-Time Signals Feed -->
       <div class="bg-[#121824] rounded-xl border border-gray-800 p-4">
-        <h2 class="text-sm font-semibold text-gray-300 mb-3 flex items-center justify-between">
-          <span>Recent AI Alerts</span>
-          <span id="update-time" class="text-xs text-gray-500 font-normal">Auto-Synced</span>
-        </h2>
-        <div class="space-y-3 max-h-[220px] overflow-y-auto pr-1" id="signal-feed">
-          <p class="text-xs text-gray-500">Loading live signals...</p>
+        <div class="flex justify-between items-center mb-3">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-gray-300">Live AI Trade Signals</h2>
+          <span id="update-time" class="text-[10px] text-gray-500 font-mono">Syncing...</span>
+        </div>
+        <div class="space-y-2.5 max-h-[250px] overflow-y-auto pr-1" id="signal-feed">
+          <p class="text-xs text-gray-500">Loading latest scans...</p>
         </div>
       </div>
 
-      <!-- Live Technical Analysis Gauge -->
-      <div class="bg-[#121824] rounded-xl border border-gray-800 p-4 h-[300px] flex flex-col">
-        <h2 class="text-sm font-semibold text-gray-300 mb-2">Technical Meter (NIFTY 50)</h2>
+      <!-- Technical Meter Gauge -->
+      <div class="bg-[#121824] rounded-xl border border-gray-800 p-4 h-[250px] flex flex-col">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-gray-300 mb-2">Market Sentiment Gauge (NIFTY 50)</h2>
         <div class="flex-grow w-full overflow-hidden">
           <iframe 
             src="https://s.tradingview.com/embed-widget/technical-analysis/?locale=en#%7B%22interval%22%3A%221D%22%2C%22width%22%3A%22100%25%22%2C%22isTransparent%22%3Atrue%2C%22height%22%3A%22100%25%22%2C%22symbol%22%3A%22NSE%3ANIFTY%22%2C%22showIntervalTabs%22%3Atrue%2C%22displayMode%22%3A%22single%22%2C%22colorTheme%22%3A%22dark%22%7D" 
@@ -79,7 +84,7 @@
     let currentWidget = null;
 
     function loadTicker(symbol) {
-      document.getElementById('chart-title').innerText = `Live Chart: ${symbol}`;
+      document.getElementById('chart-title').innerText = symbol;
       document.getElementById('tradingview_widget').innerHTML = '';
       currentWidget = new TradingView.widget({
         "autosize": true,
@@ -97,7 +102,7 @@
       });
     }
 
-    // Default Load
+    // Force default clean load on NSE:RELIANCE
     loadTicker("NSE:RELIANCE");
 
     async function loadLiveSignals() {
@@ -112,19 +117,27 @@
 
         const feed = document.getElementById('signal-feed');
         if (!data.signals || data.signals.length === 0) {
-          feed.innerHTML = '<p class="text-xs text-gray-500">No active breakout/rebound setups right now.</p>';
+          feed.innerHTML = '<p class="text-xs text-gray-500">No active trigger setups right now.</p>';
           return;
         }
 
         feed.innerHTML = data.signals.map(s => {
+          const isBuy = s.type === "BUY";
+          const borderClass = isBuy ? "border-emerald-500" : "border-rose-500";
+          const badgeClass = isBuy ? "text-emerald-400 bg-emerald-950/60" : "text-rose-400 bg-rose-950/60";
           const cleanTicker = s.ticker.replace('.NS', '');
+
           return `
-            <div onclick="loadTicker('NSE:${cleanTicker}')" class="p-3 bg-[#182234] hover:bg-[#1f2d44] cursor-pointer border-l-4 border-emerald-500 rounded-r-lg transition">
+            <div onclick="loadTicker('NSE:${cleanTicker}')" class="p-3 bg-[#161f2e] hover:bg-[#1c283c] cursor-pointer border-l-4 ${borderClass} rounded-r-lg transition">
               <div class="flex justify-between items-center text-xs font-bold">
-                <span class="text-emerald-400">🟢 BUY SETUP: ${s.ticker}</span>
+                <span class="${badgeClass} px-2 py-0.5 rounded font-mono">${isBuy ? '🟢 BUY' : '🔴 EXIT'}: ${s.ticker}</span>
                 <span class="text-gray-400 font-normal text-[10px]">${s.time.split(',')[1] || s.time}</span>
               </div>
-              <p class="text-xs text-gray-300 mt-1 font-mono">Price: ₹${s.price} | RSI: ${s.rsi}</p>
+              <div class="flex gap-3 text-[11px] text-gray-300 font-mono mt-1.5">
+                <span>₹${s.price}</span>
+                <span>RSI: ${s.rsi}</span>
+                <span>${s.indicators || ''}</span>
+              </div>
               <p class="text-xs text-gray-400 mt-1 text-[11px] leading-snug">${s.analysis}</p>
             </div>
           `;
