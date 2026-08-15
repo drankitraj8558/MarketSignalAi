@@ -1,26 +1,41 @@
 {
-  "last_updated": "15 Aug 2026, 10:48 PM IST",
+  "last_updated": "15 Aug 2026, 11:44 PM IST",
   "signals": [
     {
-      "ticker": "TCS.NS",
-      "price": 2361.0,
-      "rsi": 54.65,
-      "time": "15 Aug 2026, 10:48 PM IST",
-      "analysis": "Momentum setup active with RSI at 54.65."
+      "ticker": "INFY.NS",
+      "type": "EXIT",
+      "price": 1169.2,
+      "rsi": 69.82,
+      "indicators": "MACD: Bullish Crossover | Vol: Normal",
+      "time": "15 Aug 2026, 11:44 PM IST",
+      "analysis": "EXIT trigger active at \u20b91169.2 (RSI: 69.82)."
     },
     {
       "ticker": "HDFCBANK.NS",
+      "type": "EXIT",
       "price": 727.0,
       "rsi": 40.09,
-      "time": "15 Aug 2026, 10:48 PM IST",
-      "analysis": "Momentum setup active with RSI at 40.09."
+      "indicators": "MACD: Bearish | Vol: Normal",
+      "time": "15 Aug 2026, 11:44 PM IST",
+      "analysis": "EXIT trigger active at \u20b9727.0 (RSI: 40.09)."
     },
     {
-      "ticker": "ICICIBANK.NS",
-      "price": 1417.0,
-      "rsi": 45.05,
-      "time": "15 Aug 2026, 10:48 PM IST",
-      "analysis": "Momentum setup active with RSI at 45.05."
+      "ticker": "ITC.NS",
+      "type": "EXIT",
+      "price": 278.2,
+      "rsi": 38.03,
+      "indicators": "MACD: Bearish | Vol: Normal",
+      "time": "15 Aug 2026, 11:44 PM IST",
+      "analysis": "EXIT trigger active at \u20b9278.2 (RSI: 38.03)."
+    },
+    {
+      "ticker": "LT.NS",
+      "type": "EXIT",
+      "price": 4057.0,
+      "rsi": 76.15,
+      "indicators": "MACD: Bullish Crossover | Vol: Normal",
+      "time": "15 Aug 2026, 11:44 PM IST",
+      "analysis": "EXIT trigger active at \u20b94057.0 (RSI: 76.15)."
     }
   ]
 }
