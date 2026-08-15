@@ -35,19 +35,19 @@
     <div class="lg:col-span-2 bg-[#121824] rounded-xl border border-gray-800 p-4 flex flex-col h-[560px]">
       <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-2">
         <h2 id="chart-title" class="text-xs font-bold uppercase tracking-wider text-emerald-400 font-mono">NSE:RELIANCE</h2>
-        <!-- Quick Stock Switcher Buttons -->
+        <!-- Stock Switcher Buttons -->
         <div class="flex flex-wrap gap-1">
-          <button onclick="loadTicker('NSE:RELIANCE')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">RELIANCE</button>
-          <button onclick="loadTicker('NSE:TCS')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">TCS</button>
-          <button onclick="loadTicker('NSE:HDFCBANK')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">HDFCBANK</button>
-          <button onclick="loadTicker('NSE:ICICIBANK')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">ICICI</button>
-          <button onclick="loadTicker('NSE:SBIN')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">SBIN</button>
-          <button onclick="loadTicker('NSE:TATAMOTORS')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-200">TATAMOTORS</button>
+          <button onclick="loadTicker('NSE:RELIANCE')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">RELIANCE</button>
+          <button onclick="loadTicker('NSE:TCS')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">TCS</button>
+          <button onclick="loadTicker('NSE:HDFCBANK')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">HDFCBANK</button>
+          <button onclick="loadTicker('NSE:ICICIBANK')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">ICICI</button>
+          <button onclick="loadTicker('NSE:SBIN')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">SBIN</button>
+          <button onclick="loadTicker('NSE:TATAMOTORS')" class="text-[11px] bg-gray-800 hover:bg-gray-700 px-2.5 py-1 rounded text-gray-200">TATAMOTORS</button>
         </div>
       </div>
       
-      <!-- Chart Embed -->
-      <div id="tradingview_widget" class="flex-grow w-full rounded-lg overflow-hidden border border-gray-800/60"></div>
+      <!-- Chart Embed Container -->
+      <div id="chart-container" class="flex-grow w-full rounded-lg overflow-hidden border border-gray-800/60 relative"></div>
     </div>
 
     <!-- Right: Live AI Signals & Technical Meter -->
@@ -79,14 +79,28 @@
   </div>
 
   <!-- Scripts -->
-  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
   <script type="text/javascript">
-    let currentWidget = null;
-
     function loadTicker(symbol) {
       document.getElementById('chart-title').innerText = symbol;
-      document.getElementById('tradingview_widget').innerHTML = '';
-      currentWidget = new TradingView.widget({
+      const container = document.getElementById('chart-container');
+      container.innerHTML = '';
+
+      const widgetDiv = document.createElement('div');
+      widgetDiv.className = 'tradingview-widget-container';
+      widgetDiv.style.height = '100%';
+      widgetDiv.style.width = '100%';
+
+      const widgetInner = document.createElement('div');
+      widgetInner.className = 'tradingview-widget-container__widget';
+      widgetInner.style.height = '100%';
+      widgetInner.style.width = '100%';
+      widgetDiv.appendChild(widgetInner);
+
+      const script = document.createElement('script');
+      script.type = 'text/javascript';
+      script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+      script.async = true;
+      script.innerHTML = JSON.stringify({
         "autosize": true,
         "symbol": symbol,
         "interval": "D",
@@ -94,15 +108,17 @@
         "theme": "dark",
         "style": "1",
         "locale": "en",
-        "toolbar_bg": "#121824",
         "enable_publishing": false,
-        "hide_side_toolbar": false,
         "allow_symbol_change": true,
-        "container_id": "tradingview_widget"
+        "calendar": false,
+        "support_host": "https://www.tradingview.com"
       });
+
+      widgetDiv.appendChild(script);
+      container.appendChild(widgetDiv);
     }
 
-    // Force default clean load on NSE:RELIANCE
+    // Default Load on Reliance
     loadTicker("NSE:RELIANCE");
 
     async function loadLiveSignals() {
