@@ -1,4 +1,89 @@
-<script type="text/javascript">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TradePulse AI | Live Market Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #0b0e14; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  </style>
+</head>
+<body class="p-4 md:p-8">
+
+  <!-- Header -->
+  <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 pb-4 border-b border-gray-800 gap-4">
+    <div>
+      <h1 class="text-2xl font-black tracking-tight text-white flex items-center gap-2">
+        <span class="inline-block w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+        TradePulse AI Agent
+      </h1>
+      <p class="text-xs text-gray-400 mt-1">Live Quantitative Scanner & Multi-Timeframe Pattern Recognition</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs bg-emerald-950 text-emerald-400 border border-emerald-800 px-3 py-1.5 rounded-full font-mono font-medium">● Bot Active (Telegram)</span>
+      <button onclick="refreshData()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-md font-medium transition">Refresh View</button>
+    </div>
+  </header>
+
+  <!-- Main Grid -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+    <!-- Left / Center: Interactive TradingView Live Chart -->
+    <div class="lg:col-span-2 bg-[#121824] rounded-xl border border-gray-800 p-4 flex flex-col h-[520px]">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="text-sm font-semibold text-gray-300">Live Price Action (NSE / NIFTY 50)</h2>
+        <div class="flex gap-2">
+          <button onclick="loadTicker('NSE:RELIANCE')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-300">RELIANCE</button>
+          <button onclick="loadTicker('NSE:TCS')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-300">TCS</button>
+          <button onclick="loadTicker('NSE:HDFCBANK')" class="text-xs bg-gray-800 hover:bg-gray-700 px-2 py-1 rounded text-gray-300">HDFCBANK</button>
+        </div>
+      </div>
+      
+      <!-- TradingView Widget Container -->
+      <div id="tradingview_widget" class="flex-grow w-full rounded-lg overflow-hidden"></div>
+    </div>
+
+    <!-- Right Column: AI Signals & Pattern Scanner Feed -->
+    <div class="flex flex-col gap-6">
+      
+      <!-- Live Signals Log -->
+      <div class="bg-[#121824] rounded-xl border border-gray-800 p-4">
+        <h2 class="text-sm font-semibold text-gray-300 mb-3 flex items-center justify-between">
+          <span>Recent AI Alerts</span>
+          <span class="text-xs text-gray-500 font-normal">Auto-Synced</span>
+        </h2>
+        <div class="space-y-3" id="signal-feed">
+          <div class="p-3 bg-[#182234] border-l-4 border-emerald-500 rounded-r-lg">
+            <div class="flex justify-between items-center text-xs font-bold">
+              <span class="text-emerald-400">🟢 BUY SETUP: TCS.NS</span>
+              <span class="text-gray-400">Today</span>
+            </div>
+            <p class="text-xs text-gray-300 mt-1">RSI reached 54.6 with price testing 200 EMA support. Bullish continuation favored.</p>
+          </div>
+
+          <div class="p-3 bg-[#182234] border-l-4 border-emerald-500 rounded-r-lg">
+            <div class="flex justify-between items-center text-xs font-bold">
+              <span class="text-emerald-400">🟢 BUY SETUP: HDFCBANK</span>
+              <span class="text-gray-400">Today</span>
+            </div>
+            <p class="text-xs text-gray-300 mt-1">Oversold rebound pattern detected. Stop loss calculated at 5% below entry.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live Technical Gauge -->
+      <div class="bg-[#121824] rounded-xl border border-gray-800 p-4 h-[240px]">
+        <h2 class="text-sm font-semibold text-gray-300 mb-2">Technical Meter</h2>
+        <div id="tradingview_technical" class="h-full w-full"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Scripts: TradingView Embedded Embeds -->
+  <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+  <script type="text/javascript">
   let currentWidget = null;
 
   function loadTicker(symbol) {
@@ -50,3 +135,6 @@
 
   loadLiveSignals();
 </script>
+
+</body>
+</html>
