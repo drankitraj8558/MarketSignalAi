@@ -1,0 +1,26 @@
+{
+  "last_updated": "15 Aug 2026, 10:48 PM IST",
+  "signals": [
+    {
+      "ticker": "TCS.NS",
+      "price": 2361.0,
+      "rsi": 54.65,
+      "time": "15 Aug 2026, 10:48 PM IST",
+      "analysis": "Momentum setup active with RSI at 54.65."
+    },
+    {
+      "ticker": "HDFCBANK.NS",
+      "price": 727.0,
+      "rsi": 40.09,
+      "time": "15 Aug 2026, 10:48 PM IST",
+      "analysis": "Momentum setup active with RSI at 40.09."
+    },
+    {
+      "ticker": "ICICIBANK.NS",
+      "price": 1417.0,
+      "rsi": 45.05,
+      "time": "15 Aug 2026, 10:48 PM IST",
+      "analysis": "Momentum setup active with RSI at 45.05."
+    }
+  ]
+}
