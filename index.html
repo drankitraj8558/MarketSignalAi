@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>TradePulse Pro AI | Paper Trading & Live Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -23,163 +24,300 @@
     }
   </script>
   <style>
-    ::-webkit-scrollbar { width: 4px; height: 4px; }
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-thumb { background: #64748b; border-radius: 4px; }
+    .card-shadow { box-shadow: 0 4px 24px -4px rgba(0,0,0,0.25); }
+    .light .card-shadow { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.08); }
+    .signal-card { transition: all 0.2s ease; }
+    .signal-card:hover { transform: translateY(-1px); }
+    #equityChart { max-height: 220px; }
   </style>
 </head>
-<body class="bg-brandDark text-slate-100 transition-colors duration-200 p-3 md:p-6 font-sans">
+<body class="bg-brandDark text-slate-100 transition-colors duration-200 p-3 md:p-5 font-sans">
 
   <!-- Header -->
-  <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 pb-4 border-b border-borderDark dark:border-borderDark light:border-borderLight gap-3">
-    <div>
-      <h1 class="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2">
-        <span class="inline-block w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
-        <span>TradePulse Pro AI</span>
-      </h1>
-      <p class="text-xs text-slate-400 mt-0.5">Paper Trading Simulator & Multi-Indicator AI Screener</p>
+  <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 pb-4 border-b border-borderDark gap-3">
+    <div class="flex items-center gap-3">
+      <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+        <span class="text-white font-black text-sm">TP</span>
+      </div>
+      <div>
+        <h1 class="text-xl md:text-2xl font-black tracking-tight flex items-center gap-2">
+          TradePulse Pro AI
+          <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        </h1>
+        <p class="text-xs text-slate-400">Paper Trading Simulator • Multi-Indicator AI Screener</p>
+      </div>
     </div>
     
     <div class="flex flex-wrap items-center gap-2">
-      <!-- Light / Dark Mode Toggle -->
-      <button onclick="toggleTheme()" id="theme-toggle-btn" class="text-xs bg-slate-800 dark:bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 font-medium hover:bg-slate-700 transition flex items-center gap-1.5">
+      <button onclick="toggleTheme()" id="theme-toggle-btn" class="text-xs bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 font-medium hover:bg-slate-700 transition flex items-center gap-1.5">
         <span id="theme-icon">☀️</span> <span id="theme-text">Light Mode</span>
       </button>
-
-      <!-- Sync Button -->
       <button onclick="loadLiveSignals()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-medium transition">
         Sync Signals
+      </button>
+      <button onclick="exportTradesCSV()" class="text-xs bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg font-medium transition">
+        Export CSV
       </button>
     </div>
   </header>
 
-  <!-- 15-Stock Watchlist Bar -->
-  <div class="mb-4 bg-cardDark dark:bg-cardDark p-3 rounded-xl border border-borderDark card-box">
-    <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2">Watchlist Quick-Switch:</div>
-    <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs">
-      <button onclick="loadChart('BSE:RELIANCE')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">RELIANCE</button>
-      <button onclick="loadChart('BSE:TCS')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">TCS</button>
-      <button onclick="loadChart('BSE:INFY')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">INFY</button>
-      <button onclick="loadChart('BSE:HDFCBANK')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">HDFCBANK</button>
-      <button onclick="loadChart('BSE:ICICIBANK')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">ICICI</button>
-      <button onclick="loadChart('BSE:SBIN')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">SBIN</button>
-      <button onclick="loadChart('BSE:BHARTIARTL')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">AIRTEL</button>
-      <button onclick="loadChart('BSE:ITC')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">ITC</button>
-      <button onclick="loadChart('BSE:LT')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">LT</button>
-      <button onclick="loadChart('BSE:TATAMOTORS')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">TATAMOTORS</button>
-      <button onclick="loadChart('BSE:BAJFINANCE')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">BAJAJ-FIN</button>
-      <button onclick="loadChart('BSE:MARUTI')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">MARUTI</button>
-      <button onclick="loadChart('BSE:AXISBANK')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">AXIS</button>
-      <button onclick="loadChart('BSE:SUNPHARMA')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">SUNPHARMA</button>
-      <button onclick="loadChart('BSE:KOTAKBANK')" class="stock-btn px-2.5 py-1 bg-slate-800 hover:bg-slate-700 rounded text-slate-200 shrink-0 font-mono">KOTAK</button>
+  <!-- Watchlist -->
+  <div class="mb-4 bg-cardDark p-3.5 rounded-2xl border border-borderDark card-shadow card-box">
+    <div class="flex justify-between items-center mb-2.5">
+      <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Watchlist Quick-Switch</div>
+      <button onclick="paperBuyCurrent()" class="text-[11px] bg-emerald-600/20 text-emerald-400 border border-emerald-600/40 px-2.5 py-1 rounded-lg hover:bg-emerald-600/30 transition">
+        ➕ Paper Buy Current Chart
+      </button>
+    </div>
+    <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs" id="watchlist-bar">
+      <!-- populated by JS -->
     </div>
   </div>
 
-  <!-- Paper Trading Performance Bar -->
-  <div class="mb-6 bg-cardDark dark:bg-cardDark p-4 rounded-xl border border-borderDark card-box">
-    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3 gap-2">
+  <!-- Performance Stats -->
+  <div class="mb-5 bg-cardDark p-4 rounded-2xl border border-borderDark card-shadow card-box">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
       <div>
-        <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-400">Virtual Paper Trading Simulator (Zero Capital Risk)</h2>
-        <p class="text-xs text-slate-400">Simulate 1:2 Risk-Reward setups (10% Target / 5% Stop Loss)</p>
+        <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-400">Virtual Paper Trading</h2>
+        <p class="text-xs text-slate-400 mt-0.5">1:2 Risk-Reward • Configurable Position Size</p>
       </div>
-      <button onclick="resetPaperTrading()" class="text-[11px] text-rose-400 hover:underline">Reset Account</button>
+      <div class="flex items-center gap-3">
+        <select id="sizing-mode" onchange="updateSizingUI()" class="text-xs bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200">
+          <option value="fixed">Fixed ₹10,000</option>
+          <option value="risk">Risk % of Capital</option>
+        </select>
+        <div id="risk-input-wrap" class="hidden">
+          <input id="risk-pct" type="number" value="1" min="0.5" max="5" step="0.5" class="w-16 text-xs bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200" />
+          <span class="text-xs text-slate-400 ml-1">%</span>
+        </div>
+        <button onclick="resetPaperTrading()" class="text-[11px] text-rose-400 hover:underline">Reset Account</button>
+      </div>
     </div>
 
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center">
-      <div class="p-2.5 bg-slate-800/60 rounded-lg border border-slate-700/60">
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 text-center">
+      <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
         <span class="text-[10px] uppercase font-bold text-slate-400">Virtual Capital</span>
-        <div id="stat-balance" class="text-sm md:text-base font-mono font-bold text-slate-100">₹1,00,000</div>
+        <div id="stat-balance" class="text-base font-mono font-bold text-slate-100 mt-0.5">₹1,00,000</div>
       </div>
-      <div class="p-2.5 bg-slate-800/60 rounded-lg border border-slate-700/60">
-        <span class="text-[10px] uppercase font-bold text-slate-400">Total Profit / Loss</span>
-        <div id="stat-pnl" class="text-sm md:text-base font-mono font-bold text-emerald-400">₹0.00</div>
+      <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+        <span class="text-[10px] uppercase font-bold text-slate-400">Total P&L</span>
+        <div id="stat-pnl" class="text-base font-mono font-bold text-emerald-400 mt-0.5">+₹0</div>
       </div>
-      <div class="p-2.5 bg-slate-800/60 rounded-lg border border-slate-700/60">
+      <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
         <span class="text-[10px] uppercase font-bold text-slate-400">Win Rate</span>
-        <div id="stat-winrate" class="text-sm md:text-base font-mono font-bold text-blue-400">0% (0/0)</div>
+        <div id="stat-winrate" class="text-base font-mono font-bold text-blue-400 mt-0.5">0% (0/0)</div>
       </div>
-      <div class="p-2.5 bg-slate-800/60 rounded-lg border border-slate-700/60">
+      <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+        <span class="text-[10px] uppercase font-bold text-slate-400">Profit Factor</span>
+        <div id="stat-pf" class="text-base font-mono font-bold text-cyan-400 mt-0.5">—</div>
+      </div>
+      <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
+        <span class="text-[10px] uppercase font-bold text-slate-400">Max Drawdown</span>
+        <div id="stat-dd" class="text-base font-mono font-bold text-rose-400 mt-0.5">0%</div>
+      </div>
+      <div class="p-3 bg-slate-800/50 rounded-xl border border-slate-700/50">
         <span class="text-[10px] uppercase font-bold text-slate-400">Open Positions</span>
-        <div id="stat-open-count" class="text-sm md:text-base font-mono font-bold text-amber-400">0</div>
+        <div id="stat-open-count" class="text-base font-mono font-bold text-amber-400 mt-0.5">0</div>
       </div>
     </div>
   </div>
 
-  <!-- Main Trading Grid -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Main Grid -->
+  <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
 
-    <!-- Left: Live Interactive Chart -->
-    <div class="lg:col-span-2 bg-cardDark dark:bg-cardDark rounded-xl border border-borderDark p-4 flex flex-col h-[560px] card-box">
+    <!-- Chart -->
+    <div class="xl:col-span-2 bg-cardDark rounded-2xl border border-borderDark p-4 flex flex-col h-[540px] card-shadow card-box">
       <div class="flex justify-between items-center mb-3">
         <h2 id="chart-title" class="text-xs font-bold uppercase tracking-wider text-emerald-400 font-mono">BSE:RELIANCE</h2>
-        <span class="text-[10px] text-slate-400 font-mono">Live BSE Data (No Block)</span>
+        <span class="text-[10px] text-slate-400 font-mono">Live BSE Data</span>
       </div>
-      
-      <div class="flex-grow w-full rounded-lg overflow-hidden border border-slate-700/40 relative">
-        <iframe 
-          id="tv-iframe"
+      <div class="flex-grow w-full rounded-xl overflow-hidden border border-slate-700/40 relative">
+        <iframe id="tv-iframe"
           src="https://s.tradingview.com/widgetembed/?symbol=BSE%3ARELIANCE&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=121824&studies=%5B%5D&theme=dark&style=1&timezone=Asia%2FKolkata&withdateranges=1&showpopupbutton=1"
-          style="width: 100%; height: 100%; border: none;">
-        </iframe>
+          style="width:100%;height:100%;border:none;"></iframe>
       </div>
     </div>
 
-    <!-- Right: Live AI Signals & Sentiment Gauge -->
-    <div class="flex flex-col gap-6">
-      
-      <!-- AI Signals Feed -->
-      <div class="bg-cardDark dark:bg-cardDark rounded-xl border border-borderDark p-4 card-box">
+    <!-- Right Column -->
+    <div class="flex flex-col gap-5">
+
+      <!-- AI Signals -->
+      <div class="bg-cardDark rounded-2xl border border-borderDark p-4 card-shadow card-box">
         <div class="flex justify-between items-center mb-3">
           <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300">Live AI Signals</h2>
-          <span id="update-time" class="text-[10px] text-slate-500 font-mono">Syncing...</span>
+          <div class="flex items-center gap-2">
+            <select id="signal-filter" onchange="renderSignals()" class="text-[10px] bg-slate-800 border border-slate-700 rounded px-1.5 py-1 text-slate-300">
+              <option value="ALL">All</option>
+              <option value="BUY">BUY only</option>
+              <option value="EXIT">EXIT only</option>
+            </select>
+            <span id="update-time" class="text-[10px] text-slate-500 font-mono">—</span>
+          </div>
         </div>
-        <div class="space-y-2.5 max-h-[250px] overflow-y-auto pr-1" id="signal-feed">
-          <p class="text-xs text-slate-500">Loading incoming scans...</p>
-        </div>
-      </div>
-
-      <!-- Market Sentiment Gauge -->
-      <div class="bg-cardDark dark:bg-cardDark rounded-xl border border-borderDark p-4 h-[250px] flex flex-col card-box">
-        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Market Sentiment Gauge (NIFTY 50)</h2>
-        <div class="flex-grow w-full overflow-hidden">
-          <iframe 
-            id="gauge-iframe"
-            src="https://s.tradingview.com/embed-widget/technical-analysis/?locale=en#%7B%22interval%22%3A%221D%22%2C%22width%22%3A%22100%25%22%2C%22isTransparent%22%3Atrue%2C%22height%22%3A%22100%25%22%2C%22symbol%22%3A%22NSE%3ANIFTY%22%2C%22showIntervalTabs%22%3Atrue%2C%22displayMode%22%3A%22single%22%2C%22colorTheme%22%3A%22dark%22%7D" 
-            style="width: 100%; height: 100%; border: none;">
-          </iframe>
+        <div class="space-y-2.5 max-h-[280px] overflow-y-auto pr-1" id="signal-feed">
+          <p class="text-xs text-slate-500 py-6 text-center">Loading signals...</p>
         </div>
       </div>
 
+      <!-- Sentiment -->
+      <div class="bg-cardDark rounded-2xl border border-borderDark p-4 h-[240px] flex flex-col card-shadow card-box">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Market Sentiment (NIFTY 50)</h2>
+        <div class="flex-grow w-full overflow-hidden rounded-lg">
+          <iframe id="gauge-iframe"
+            src="https://s.tradingview.com/embed-widget/technical-analysis/?locale=en#%7B%22interval%22%3A%221D%22%2C%22width%22%3A%22100%25%22%2C%22isTransparent%22%3Atrue%2C%22height%22%3A%22100%25%22%2C%22symbol%22%3A%22NSE%3ANIFTY%22%2C%22showIntervalTabs%22%3Atrue%2C%22displayMode%22%3A%22single%22%2C%22colorTheme%22%3A%22dark%22%7D"
+            style="width:100%;height:100%;border:none;"></iframe>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- Active Paper Trades Log Table -->
-  <div class="mt-6 bg-cardDark dark:bg-cardDark rounded-xl border border-borderDark p-4 card-box">
+  <!-- Equity Curve + Exposure -->
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
+    <div class="lg:col-span-2 bg-cardDark rounded-2xl border border-borderDark p-4 card-shadow card-box">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 mb-3">Equity Curve</h2>
+      <canvas id="equityChart"></canvas>
+    </div>
+    <div class="bg-cardDark rounded-2xl border border-borderDark p-4 card-shadow card-box">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 mb-3">Portfolio Exposure</h2>
+      <div id="exposure-list" class="space-y-2 text-xs">
+        <p class="text-slate-500 text-center py-8">No open positions</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Positions -->
+  <div class="mt-5 bg-cardDark rounded-2xl border border-borderDark p-4 card-shadow card-box">
     <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 mb-3">Active Paper Positions</h2>
     <div class="overflow-x-auto">
       <table class="w-full text-left text-xs">
         <thead class="text-[10px] uppercase bg-slate-800/80 text-slate-400">
           <tr>
             <th class="p-2.5">Stock</th>
-            <th class="p-2.5">Entry Price</th>
+            <th class="p-2.5">Entry</th>
             <th class="p-2.5">Target (+10%)</th>
-            <th class="p-2.5">Stop Loss (-5%)</th>
-            <th class="p-2.5">Qty (₹10k Lot)</th>
-            <th class="p-2.5 text-center">Test Outcome</th>
+            <th class="p-2.5">Stop (-5%)</th>
+            <th class="p-2.5">Qty</th>
+            <th class="p-2.5">Risk ₹</th>
+            <th class="p-2.5 text-center">Actions</th>
           </tr>
         </thead>
         <tbody id="open-trades-table" class="divide-y divide-slate-800">
-          <tr>
-            <td colspan="6" class="p-3 text-center text-slate-500">No active paper trades. Tap "➕ Paper Buy" on any signal above to open a simulated trade.</td>
-          </tr>
+          <tr><td colspan="7" class="p-4 text-center text-slate-500">No active paper trades.</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 
-  <!-- Scripts -->
-  <script type="text/javascript">
-    let currentTheme = localStorage.getItem('theme') || 'dark';
+  <!-- Closed Trades History -->
+  <div class="mt-5 bg-cardDark rounded-2xl border border-borderDark p-4 card-shadow card-box">
+    <div class="flex justify-between items-center mb-3">
+      <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">Closed Trades History</h2>
+      <span id="closed-count" class="text-xs text-slate-400">0 trades</span>
+    </div>
+    <div class="overflow-x-auto max-h-[320px] overflow-y-auto">
+      <table class="w-full text-left text-xs">
+        <thead class="text-[10px] uppercase bg-slate-800/80 text-slate-400 sticky top-0">
+          <tr>
+            <th class="p-2.5">Stock</th>
+            <th class="p-2.5">Entry → Exit</th>
+            <th class="p-2.5">Outcome</th>
+            <th class="p-2.5">P&L</th>
+            <th class="p-2.5">Date</th>
+            <th class="p-2.5">Notes</th>
+          </tr>
+        </thead>
+        <tbody id="closed-trades-table" class="divide-y divide-slate-800">
+          <tr><td colspan="6" class="p-4 text-center text-slate-500">No closed trades yet.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 
+  <!-- Risk Calculator Modal -->
+  <div id="risk-modal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
+    <div class="bg-cardDark border border-borderDark rounded-2xl p-5 w-full max-w-md card-shadow">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400 mb-4">Confirm Paper Trade</h3>
+      <div class="space-y-3 text-sm">
+        <div class="flex justify-between"><span class="text-slate-400">Symbol</span><span id="modal-symbol" class="font-mono font-bold"></span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Entry Price</span><span id="modal-price" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Position Size</span><span id="modal-size" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Quantity</span><span id="modal-qty" class="font-mono"></span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Target (10%)</span><span id="modal-target" class="font-mono text-emerald-400"></span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Stop Loss (5%)</span><span id="modal-sl" class="font-mono text-rose-400"></span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Risk Amount</span><span id="modal-risk" class="font-mono text-amber-400"></span></div>
+        <div class="flex justify-between"><span class="text-slate-400">Reward Amount</span><span id="modal-reward" class="font-mono text-emerald-400"></span></div>
+      </div>
+      <div class="flex gap-3 mt-5">
+        <button onclick="closeRiskModal()" class="flex-1 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm">Cancel</button>
+        <button onclick="confirmPaperTrade()" class="flex-1 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-sm font-bold">Open Trade</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Close Trade Modal (with notes) -->
+  <div id="close-modal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
+    <div class="bg-cardDark border border-borderDark rounded-2xl p-5 w-full max-w-md card-shadow">
+      <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200 mb-4">Close Trade</h3>
+      <div class="space-y-3">
+        <div>
+          <label class="text-xs text-slate-400">Outcome</label>
+          <select id="close-outcome" class="w-full mt-1 text-sm bg-slate-800 border border-slate-700 rounded-lg px-3 py-2">
+            <option value="TARGET">Hit Target (+10%)</option>
+            <option value="SL">Hit Stop Loss (-5%)</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-xs text-slate-400">Journal Note (optional)</label>
+          <textarea id="close-note" rows="3" placeholder="Why did this trade work / fail?" class="w-full mt-1 text-sm bg-slate-800 border border-slate-700 rounded-lg px-3 py-2 resize-none"></textarea>
+        </div>
+      </div>
+      <div class="flex gap-3 mt-5">
+        <button onclick="closeCloseModal()" class="flex-1 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-sm">Cancel</button>
+        <button onclick="confirmCloseTrade()" class="flex-1 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-sm font-bold">Close Trade</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========== STATE ==========
+    let currentTheme = localStorage.getItem('theme') || 'dark';
+    let currentSymbol = 'BSE:RELIANCE';
+    let pendingTrade = null;
+    let closingTradeId = null;
+    let lastSignalIds = new Set();
+    let equityChart = null;
+
+    const WATCHLIST = [
+      { symbol: 'BSE:RELIANCE', name: 'RELIANCE' },
+      { symbol: 'BSE:TCS', name: 'TCS' },
+      { symbol: 'BSE:INFY', name: 'INFY' },
+      { symbol: 'BSE:HDFCBANK', name: 'HDFCBANK' },
+      { symbol: 'BSE:ICICIBANK', name: 'ICICI' },
+      { symbol: 'BSE:SBIN', name: 'SBIN' },
+      { symbol: 'BSE:BHARTIARTL', name: 'AIRTEL' },
+      { symbol: 'BSE:ITC', name: 'ITC' },
+      { symbol: 'BSE:LT', name: 'LT' },
+      { symbol: 'BSE:TATAMOTORS', name: 'TATAMOTORS' },
+      { symbol: 'BSE:BAJFINANCE', name: 'BAJAJ-FIN' },
+      { symbol: 'BSE:MARUTI', name: 'MARUTI' },
+      { symbol: 'BSE:AXISBANK', name: 'AXIS' },
+      { symbol: 'BSE:SUNPHARMA', name: 'SUNPHARMA' },
+      { symbol: 'BSE:KOTAKBANK', name: 'KOTAK' }
+    ];
+
+    let paperState = JSON.parse(localStorage.getItem('tradePulsePaperStateV2')) || {
+      balance: 100000,
+      initialBalance: 100000,
+      openTrades: [],
+      closedTrades: [],
+      equityHistory: [{ time: Date.now(), balance: 100000 }]
+    };
+
+    let signalsCache = [];
+
+    // ========== THEME ==========
     function applyTheme(theme) {
       currentTheme = theme;
       localStorage.setItem('theme', theme);
@@ -189,92 +327,184 @@
       const themeIcon = document.getElementById('theme-icon');
 
       if (isDark) {
-        body.className = 'bg-[#0b0e14] text-slate-100 p-3 md:p-6 font-sans';
+        body.className = 'bg-[#0b0e14] text-slate-100 p-3 md:p-5 font-sans';
         document.querySelectorAll('.card-box').forEach(el => {
           el.style.backgroundColor = '#121824';
           el.style.borderColor = '#1e293b';
         });
         themeText.innerText = 'Light Mode';
         themeIcon.innerText = '☀️';
+        document.documentElement.classList.add('dark');
+        document.documentElement.classList.remove('light');
       } else {
-        body.className = 'bg-[#f1f5f9] text-slate-900 p-3 md:p-6 font-sans';
+        body.className = 'bg-[#f1f5f9] text-slate-900 p-3 md:p-5 font-sans light';
         document.querySelectorAll('.card-box').forEach(el => {
           el.style.backgroundColor = '#ffffff';
-          el.style.borderColor = '#cbd5e1';
+          el.style.borderColor = '#e2e8f0';
         });
         themeText.innerText = 'Dark Mode';
         themeIcon.innerText = '🌙';
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
       }
+      loadChart(currentSymbol);
+      if (equityChart) updateEquityChart();
     }
 
     function toggleTheme() {
       applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
-      // Reload chart iframe with updated theme
-      const currentTitle = document.getElementById('chart-title').innerText;
-      loadChart(currentTitle);
     }
 
+    // ========== CHART ==========
     function loadChart(symbol) {
+      currentSymbol = symbol;
       document.getElementById('chart-title').innerText = symbol;
-      const encodedSymbol = encodeURIComponent(symbol);
+      const encoded = encodeURIComponent(symbol);
       const themeParam = currentTheme === 'dark' ? 'dark' : 'light';
       const bgParam = currentTheme === 'dark' ? '121824' : 'ffffff';
-      document.getElementById('tv-iframe').src = 
-        `https://s.tradingview.com/widgetembed/?symbol=${encodedSymbol}&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=${bgParam}&studies=%5B%5D&theme=${themeParam}&style=1&timezone=Asia%2FKolkata&withdateranges=1&showpopupbutton=1`;
+      document.getElementById('tv-iframe').src =
+        `https://s.tradingview.com/widgetembed/?symbol=\( {encoded}&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg= \){bgParam}&studies=%5B%5D&theme=${themeParam}&style=1&timezone=Asia%2FKolkata&withdateranges=1&showpopupbutton=1`;
+      renderWatchlist();
     }
 
-    // --- Paper Trading Simulator Engine ---
-    let paperState = JSON.parse(localStorage.getItem('tradePulsePaperState')) || {
-      balance: 100000,
-      initialBalance: 100000,
-      openTrades: [],
-      closedTrades: []
-    };
+    // ========== WATCHLIST ==========
+    function renderWatchlist() {
+      const bar = document.getElementById('watchlist-bar');
+      bar.innerHTML = WATCHLIST.map(w => {
+        const active = currentSymbol === w.symbol;
+        return `<button onclick="loadChart('${w.symbol}')" 
+          class="stock-btn px-2.5 py-1.5 rounded-lg shrink-0 font-mono text-xs transition
+          ${active ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'}">
+          ${w.name}
+        </button>`;
+      }).join('');
+    }
 
+    // ========== SIZING ==========
+    function updateSizingUI() {
+      const mode = document.getElementById('sizing-mode').value;
+      document.getElementById('risk-input-wrap').classList.toggle('hidden', mode !== 'risk');
+    }
+
+    function calcPositionSize(price) {
+      const mode = document.getElementById('sizing-mode').value;
+      if (mode === 'fixed') {
+        return 10000;
+      } else {
+        const riskPct = parseFloat(document.getElementById('risk-pct').value) || 1;
+        const riskAmount = paperState.balance * (riskPct / 100);
+        // 5% stop → position size = riskAmount / 0.05
+        return Math.max(1000, riskAmount / 0.05);
+      }
+    }
+
+    // ========== PAPER TRADING ==========
     function savePaperState() {
-      localStorage.setItem('tradePulsePaperState', JSON.stringify(paperState));
-      renderPaperTrading();
+      localStorage.setItem('tradePulsePaperStateV2', JSON.stringify(paperState));
+      renderAll();
     }
 
-    function openPaperTrade(ticker, price) {
-      const positionCapital = 10000; // Allocate ₹10,000 per trade
-      const qty = Math.max(1, Math.floor(positionCapital / price));
+    function openPaperTradeModal(ticker, price) {
+      const size = calcPositionSize(price);
+      const qty = Math.max(1, Math.floor(size / price));
       const target = Math.round(price * 1.10 * 100) / 100;
       const stopLoss = Math.round(price * 0.95 * 100) / 100;
+      const riskAmt = Math.round((price - stopLoss) * qty);
+      const rewardAmt = Math.round((target - price) * qty);
 
-      const trade = {
-        id: Date.now(),
-        ticker: ticker,
-        entryPrice: price,
-        qty: qty,
-        target: target,
-        stopLoss: stopLoss,
-        entryTime: new Date().toLocaleDateString()
-      };
+      pendingTrade = { ticker, price, qty, target, stopLoss, size, riskAmt, rewardAmt };
 
-      paperState.openTrades.push(trade);
-      savePaperState();
+      document.getElementById('modal-symbol').innerText = ticker;
+      document.getElementById('modal-price').innerText = `₹${price}`;
+      document.getElementById('modal-size').innerText = `₹${Math.round(size).toLocaleString('en-IN')}`;
+      document.getElementById('modal-qty').innerText = `${qty} shares`;
+      document.getElementById('modal-target').innerText = `₹${target}`;
+      document.getElementById('modal-sl').innerText = `₹${stopLoss}`;
+      document.getElementById('modal-risk').innerText = `₹${riskAmt}`;
+      document.getElementById('modal-reward').innerText = `₹${rewardAmt}`;
+
+      document.getElementById('risk-modal').classList.remove('hidden');
+      document.getElementById('risk-modal').classList.add('flex');
     }
 
-    function closePaperTrade(id, outcome) {
+    function closeRiskModal() {
+      document.getElementById('risk-modal').classList.add('hidden');
+      document.getElementById('risk-modal').classList.remove('flex');
+      pendingTrade = null;
+    }
+
+    function confirmPaperTrade() {
+      if (!pendingTrade) return;
+      const t = pendingTrade;
+      const trade = {
+        id: Date.now(),
+        ticker: t.ticker,
+        entryPrice: t.price,
+        qty: t.qty,
+        target: t.target,
+        stopLoss: t.stopLoss,
+        riskAmount: t.riskAmt,
+        entryTime: new Date().toLocaleString('en-IN'),
+        capitalUsed: t.size
+      };
+      paperState.openTrades.push(trade);
+      savePaperState();
+      closeRiskModal();
+    }
+
+    function paperBuyCurrent() {
+      // Use a placeholder price – in real use you would fetch live price
+      const clean = currentSymbol.replace('BSE:', '');
+      const dummyPrice = 1000; // replace with real price later
+      openPaperTradeModal(clean, dummyPrice);
+      alert('Using placeholder price ₹1000. Connect a live price API for accurate entries.');
+    }
+
+    function openCloseModal(id) {
+      closingTradeId = id;
+      document.getElementById('close-note').value = '';
+      document.getElementById('close-modal').classList.remove('hidden');
+      document.getElementById('close-modal').classList.add('flex');
+    }
+
+    function closeCloseModal() {
+      document.getElementById('close-modal').classList.add('hidden');
+      document.getElementById('close-modal').classList.remove('flex');
+      closingTradeId = null;
+    }
+
+    function confirmCloseTrade() {
+      if (!closingTradeId) return;
+      const outcome = document.getElementById('close-outcome').value;
+      const note = document.getElementById('close-note').value.trim();
+      closePaperTrade(closingTradeId, outcome, note);
+      closeCloseModal();
+    }
+
+    function closePaperTrade(id, outcome, note = '') {
       const index = paperState.openTrades.findIndex(t => t.id === id);
       if (index === -1) return;
 
       const trade = paperState.openTrades[index];
       let pnl = 0;
-
       if (outcome === 'TARGET') {
         pnl = (trade.target - trade.entryPrice) * trade.qty;
-      } else if (outcome === 'SL') {
+      } else {
         pnl = (trade.stopLoss - trade.entryPrice) * trade.qty;
       }
 
       paperState.balance += pnl;
-      paperState.closedTrades.push({
+      paperState.closedTrades.unshift({
         ...trade,
         closeOutcome: outcome,
         pnl: pnl,
-        closeTime: new Date().toLocaleDateString()
+        note: note,
+        closeTime: new Date().toLocaleString('en-IN')
+      });
+
+      paperState.equityHistory.push({
+        time: Date.now(),
+        balance: paperState.balance
       });
 
       paperState.openTrades.splice(index, 1);
@@ -282,99 +512,273 @@
     }
 
     function resetPaperTrading() {
-      if (confirm("Reset paper trading portfolio back to ₹1,00,000?")) {
+      if (confirm('Reset paper trading portfolio back to ₹1,00,000? This cannot be undone.')) {
         paperState = {
           balance: 100000,
           initialBalance: 100000,
           openTrades: [],
-          closedTrades: []
+          closedTrades: [],
+          equityHistory: [{ time: Date.now(), balance: 100000 }]
         };
         savePaperState();
       }
     }
 
-    function renderPaperTrading() {
+    // ========== RENDER ==========
+    function renderAll() {
+      renderPaperStats();
+      renderOpenTrades();
+      renderClosedTrades();
+      renderExposure();
+      updateEquityChart();
+    }
+
+    function renderPaperStats() {
       const totalPnl = paperState.balance - paperState.initialBalance;
-      const totalClosed = paperState.closedTrades.length;
-      const wins = paperState.closedTrades.filter(t => t.pnl > 0).length;
-      const winRate = totalClosed > 0 ? Math.round((wins / totalClosed) * 100) : 0;
+      const closed = paperState.closedTrades;
+      const wins = closed.filter(t => t.pnl > 0);
+      const losses = closed.filter(t => t.pnl <= 0);
+      const winRate = closed.length ? Math.round((wins.length / closed.length) * 100) : 0;
+
+      const grossProfit = wins.reduce((s, t) => s + t.pnl, 0);
+      const grossLoss = Math.abs(losses.reduce((s, t) => s + t.pnl, 0));
+      const pf = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : (grossProfit > 0 ? '∞' : '—');
+
+      // Max Drawdown
+      let peak = paperState.initialBalance;
+      let maxDD = 0;
+      paperState.equityHistory.forEach(h => {
+        if (h.balance > peak) peak = h.balance;
+        const dd = ((peak - h.balance) / peak) * 100;
+        if (dd > maxDD) maxDD = dd;
+      });
 
       document.getElementById('stat-balance').innerText = `₹${Math.round(paperState.balance).toLocaleString('en-IN')}`;
-      
       const pnlEl = document.getElementById('stat-pnl');
-      pnlEl.innerText = `${totalPnl >= 0 ? '+' : ''}₹${Math.round(totalPnl).toLocaleString('en-IN')}`;
-      pnlEl.className = `text-sm md:text-base font-mono font-bold ${totalPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
+      pnlEl.innerText = `\( {totalPnl >= 0 ? '+' : ''}₹ \){Math.round(totalPnl).toLocaleString('en-IN')}`;
+      pnlEl.className = `text-base font-mono font-bold mt-0.5 ${totalPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
 
-      document.getElementById('stat-winrate').innerText = `${winRate}% (${wins}/${totalClosed})`;
+      document.getElementById('stat-winrate').innerText = `\( {winRate}% ( \){wins.length}/${closed.length})`;
+      document.getElementById('stat-pf').innerText = pf;
+      document.getElementById('stat-dd').innerText = `${maxDD.toFixed(1)}%`;
       document.getElementById('stat-open-count').innerText = paperState.openTrades.length;
+      document.getElementById('closed-count').innerText = `${closed.length} trades`;
+    }
 
+    function renderOpenTrades() {
       const tbody = document.getElementById('open-trades-table');
       if (paperState.openTrades.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-3 text-center text-slate-500">No active paper trades. Tap "➕ Paper Buy" on any signal above to open a simulated trade.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" class="p-4 text-center text-slate-500">No active paper trades. Use “➕ Paper Buy” on a signal or the current chart.</td></tr>`;
         return;
       }
-
       tbody.innerHTML = paperState.openTrades.map(t => `
         <tr class="hover:bg-slate-800/40">
           <td class="p-2.5 font-bold font-mono text-emerald-400">${t.ticker}</td>
           <td class="p-2.5 font-mono">₹${t.entryPrice}</td>
-          <td class="p-2.5 font-mono text-emerald-400">₹${t.target} (+10%)</td>
-          <td class="p-2.5 font-mono text-rose-400">₹${t.stopLoss} (-5%)</td>
-          <td class="p-2.5 font-mono">${t.qty} shs</td>
-          <td class="p-2.5 text-center flex justify-center gap-2">
-            <button onclick="closePaperTrade(${t.id}, 'TARGET')" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold">Hit Target (+₹${Math.round((t.target - t.entryPrice)*t.qty)})</button>
-            <button onclick="closePaperTrade(${t.id}, 'SL')" class="px-2 py-0.5 bg-rose-600 hover:bg-rose-500 text-white rounded text-[10px] font-bold">Hit SL (-₹${Math.round((t.entryPrice - t.stopLoss)*t.qty)})</button>
+          <td class="p-2.5 font-mono text-emerald-400">₹${t.target}</td>
+          <td class="p-2.5 font-mono text-rose-400">₹${t.stopLoss}</td>
+          <td class="p-2.5 font-mono">${t.qty}</td>
+          <td class="p-2.5 font-mono text-amber-400">₹${t.riskAmount || '—'}</td>
+          <td class="p-2.5 text-center">
+            <button onclick="openCloseModal(${t.id})" class="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white rounded text-[10px] font-bold">Close</button>
           </td>
         </tr>
       `).join('');
     }
 
-    // --- Live Signals Loader ---
+    function renderClosedTrades() {
+      const tbody = document.getElementById('closed-trades-table');
+      if (paperState.closedTrades.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-500">No closed trades yet.</td></tr>`;
+        return;
+      }
+      tbody.innerHTML = paperState.closedTrades.map(t => {
+        const isWin = t.pnl > 0;
+        return `
+          <tr class="hover:bg-slate-800/30">
+            <td class="p-2.5 font-mono font-bold">${t.ticker}</td>
+            <td class="p-2.5 font-mono text-slate-400">₹\( {t.entryPrice} → ₹ \){t.closeOutcome === 'TARGET' ? t.target : t.stopLoss}</td>
+            <td class="p-2.5"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold \( {isWin ? 'bg-emerald-900/60 text-emerald-400' : 'bg-rose-900/60 text-rose-400'}"> \){t.closeOutcome}</span></td>
+            <td class="p-2.5 font-mono font-bold \( {isWin ? 'text-emerald-400' : 'text-rose-400'}"> \){isWin ? '+' : ''}₹${Math.round(t.pnl)}</td>
+            <td class="p-2.5 text-slate-500">${t.closeTime.split(',')[0]}</td>
+            <td class="p-2.5 text-slate-400 max-w-[180px] truncate" title="\( {t.note || ''}"> \){t.note || '—'}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderExposure() {
+      const el = document.getElementById('exposure-list');
+      if (paperState.openTrades.length === 0) {
+        el.innerHTML = `<p class="text-slate-500 text-center py-8">No open positions</p>`;
+        return;
+      }
+      const totalUsed = paperState.openTrades.reduce((s, t) => s + (t.capitalUsed || t.entryPrice * t.qty), 0);
+      el.innerHTML = paperState.openTrades.map(t => {
+        const used = t.capitalUsed || t.entryPrice * t.qty;
+        const pct = totalUsed > 0 ? Math.round((used / totalUsed) * 100) : 0;
+        return `
+          <div class="flex items-center justify-between p-2 rounded-lg bg-slate-800/50">
+            <div>
+              <div class="font-mono font-bold text-emerald-400">${t.ticker}</div>
+              <div class="text-[10px] text-slate-400">₹${Math.round(used).toLocaleString('en-IN')} • ${t.qty} sh</div>
+            </div>
+            <div class="text-right">
+              <div class="font-mono text-xs">${pct}%</div>
+              <div class="w-16 h-1.5 bg-slate-700 rounded-full mt-1 overflow-hidden">
+                <div class="h-full bg-emerald-500 rounded-full" style="width:${pct}%"></div>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function updateEquityChart() {
+      const ctx = document.getElementById('equityChart').getContext('2d');
+      const labels = paperState.equityHistory.map((_, i) => i === 0 ? 'Start' : `T${i}`);
+      const data = paperState.equityHistory.map(h => h.balance);
+
+      if (equityChart) equityChart.destroy();
+
+      equityChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [{
+            label: 'Equity',
+            data,
+            borderColor: '#10b981',
+            backgroundColor: 'rgba(16,185,129,0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { grid: { color: 'rgba(100,116,139,0.15)' }, ticks: { color: '#94a3b8', font: { size: 10 } } },
+            y: { grid: { color: 'rgba(100,116,139,0.15)' }, ticks: { color: '#94a3b8', font: { size: 10 } } }
+          }
+        }
+      });
+    }
+
+    // ========== SIGNALS ==========
     async function loadLiveSignals() {
       try {
-        const res = await fetch('./signals.json?t=' + new Date().getTime());
-        if (!res.ok) return;
+        const res = await fetch('./signals.json?t=' + Date.now());
+        if (!res.ok) throw new Error('no file');
         const data = await res.json();
-        
+        signalsCache = data.signals || [];
         if (data.last_updated) {
           document.getElementById('update-time').innerText = data.last_updated;
         }
-
-        const feed = document.getElementById('signal-feed');
-        if (!data.signals || data.signals.length === 0) {
-          feed.innerHTML = '<p class="text-xs text-slate-500">No active breakout/rebound setups triggered.</p>';
-          return;
-        }
-
-        feed.innerHTML = data.signals.map(s => {
-          const isBuy = s.type === "BUY";
-          const borderClass = isBuy ? "border-emerald-500" : "border-rose-500";
-          const badgeClass = isBuy ? "text-emerald-400 bg-emerald-950/60" : "text-rose-400 bg-rose-950/60";
-          const cleanTicker = s.ticker.replace('.NS', '');
-
-          return `
-            <div class="p-3 bg-slate-900/80 hover:bg-slate-800/80 border-l-4 ${borderClass} rounded-r-lg transition">
-              <div class="flex justify-between items-center text-xs font-bold">
-                <span onclick="loadChart('BSE:${cleanTicker}')" class="${badgeClass} px-2 py-0.5 rounded font-mono cursor-pointer">${isBuy ? '🟢 BUY' : '🔴 EXIT'}: ${cleanTicker}</span>
-                <span class="text-slate-400 font-normal text-[10px]">${s.time.split(',')[1] || s.time}</span>
-              </div>
-              <div class="flex justify-between items-center text-[11px] text-slate-300 font-mono mt-1.5">
-                <span>₹${s.price} | RSI: ${s.rsi}</span>
-                ${isBuy ? `<button onclick="openPaperTrade('${cleanTicker}', ${s.price})" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold">➕ Paper Buy</button>` : ''}
-              </div>
-              <p class="text-xs text-slate-400 mt-1 text-[11px] leading-snug">${s.analysis}</p>
-            </div>
-          `;
-        }).join('');
+        checkNewBuyNotifications(signalsCache);
+        renderSignals();
       } catch (e) {
-        console.log("Awaiting sync...");
+        document.getElementById('signal-feed').innerHTML = `
+          <p class="text-xs text-slate-500 py-4 text-center">
+            No signals.json found or empty.<br>
+            Place a signals.json file next to this HTML to see live AI signals.
+          </p>`;
       }
     }
 
-    // Initialize
+    function renderSignals() {
+      const filter = document.getElementById('signal-filter').value;
+      let list = signalsCache;
+      if (filter !== 'ALL') list = list.filter(s => s.type === filter);
+
+      const feed = document.getElementById('signal-feed');
+      if (!list.length) {
+        feed.innerHTML = `<p class="text-xs text-slate-500 py-6 text-center">No matching signals.</p>`;
+        return;
+      }
+
+      feed.innerHTML = list.map(s => {
+        const isBuy = s.type === 'BUY';
+        const border = isBuy ? 'border-emerald-500' : 'border-rose-500';
+        const badge = isBuy ? 'text-emerald-400 bg-emerald-950/50' : 'text-rose-400 bg-rose-950/50';
+        const clean = (s.ticker || '').replace('.NS', '');
+
+        return `
+          <div class="signal-card p-3 bg-slate-900/70 hover:bg-slate-800/80 border-l-4 ${border} rounded-r-xl">
+            <div class="flex justify-between items-center text-xs font-bold">
+              <span onclick="loadChart('BSE:\( {clean}')" class=" \){badge} px-2 py-0.5 rounded font-mono cursor-pointer">
+                ${isBuy ? '🟢 BUY' : '🔴 EXIT'}: ${clean}
+              </span>
+              <span class="text-slate-500 font-normal text-[10px]">${(s.time || '').split(',')[1] || s.time || ''}</span>
+            </div>
+            <div class="flex justify-between items-center text-[11px] text-slate-300 font-mono mt-1.5">
+              <span>₹${s.price} • RSI ${s.rsi}</span>
+              \( {isBuy ? `<button onclick="openPaperTradeModal(' \){clean}', ${s.price})" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold">➕ Paper Buy</button>` : ''}
+            </div>
+            <p class="text-[11px] text-slate-400 mt-1 leading-snug">${s.analysis || ''}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function checkNewBuyNotifications(signals) {
+      if (!('Notification' in window)) return;
+      const newBuys = signals.filter(s => s.type === 'BUY' && !lastSignalIds.has(s.ticker + s.time));
+      if (newBuys.length && Notification.permission === 'granted') {
+        newBuys.forEach(s => {
+          new Notification('TradePulse – New BUY', {
+            body: `\( {s.ticker} @ ₹ \){s.price} | RSI ${s.rsi}`,
+            icon: '/favicon.ico'
+          });
+        });
+      }
+      lastSignalIds = new Set(signals.map(s => s.ticker + s.time));
+    }
+
+    // Request notification permission once
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+
+    // ========== EXPORT ==========
+    function exportTradesCSV() {
+      if (paperState.closedTrades.length === 0) {
+        alert('No closed trades to export.');
+        return;
+      }
+      const headers = ['Ticker', 'Entry', 'Exit', 'Outcome', 'PnL', 'Qty', 'Entry Time', 'Close Time', 'Note'];
+      const rows = paperState.closedTrades.map(t => [
+        t.ticker,
+        t.entryPrice,
+        t.closeOutcome === 'TARGET' ? t.target : t.stopLoss,
+        t.closeOutcome,
+        t.pnl,
+        t.qty,
+        t.entryTime,
+        t.closeTime,
+        `"${(t.note || '').replace(/"/g, '""')}"`
+      ]);
+      const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `tradepulse_trades_${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // ========== INIT ==========
     applyTheme(currentTheme);
-    renderPaperTrading();
+    renderWatchlist();
+    renderAll();
     loadLiveSignals();
+    updateSizingUI();
+
+    // Auto-refresh signals every 60s
+    setInterval(loadLiveSignals, 60000);
   </script>
 </body>
 </html>
