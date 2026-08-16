@@ -15,9 +15,6 @@
             brandDark: '#0b0e14',
             cardDark: '#121824',
             borderDark: '#1e293b',
-            brandLight: '#f8fafc',
-            cardLight: '#ffffff',
-            borderLight: '#e2e8f0'
           }
         }
       }
@@ -27,16 +24,28 @@
     ::-webkit-scrollbar { width: 5px; height: 5px; }
     ::-webkit-scrollbar-thumb { background: #64748b; border-radius: 4px; }
     .card-shadow { box-shadow: 0 4px 24px -4px rgba(0,0,0,0.25); }
-    .light .card-shadow { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.08); }
+    html.light .card-shadow { box-shadow: 0 4px 20px -4px rgba(0,0,0,0.08); }
     .signal-card { transition: all 0.2s ease; }
     .signal-card:hover { transform: translateY(-1px); }
     #equityChart { max-height: 220px; }
+    
+    /* Light mode overrides */
+    html.light body { background: #f1f5f9 !important; color: #0f172a !important; }
+    html.light .card-box { background: #ffffff !important; border-color: #e2e8f0 !important; }
+    html.light .bg-slate-800, html.light .bg-slate-800\/50, html.light .bg-slate-800\/60,
+    html.light .bg-slate-900\/70, html.light .bg-slate-900\/80 { background-color: #f8fafc !important; }
+    html.light .border-slate-700, html.light .border-slate-700\/50, html.light .border-slate-700\/40,
+    html.light .border-slate-800 { border-color: #e2e8f0 !important; }
+    html.light .text-slate-100, html.light .text-slate-200, html.light .text-slate-300 { color: #1e293b !important; }
+    html.light .text-slate-400, html.light .text-slate-500 { color: #64748b !important; }
+    html.light .divide-slate-800 > * + * { border-color: #e2e8f0 !important; }
+    html.light .hover\:bg-slate-800\/40:hover, html.light .hover\:bg-slate-800\/30:hover { background-color: #f1f5f9 !important; }
   </style>
 </head>
-<body class="bg-brandDark text-slate-100 transition-colors duration-200 p-3 md:p-5 font-sans">
+<body class="bg-[#0b0e14] text-slate-100 transition-colors duration-200 p-3 md:p-5 font-sans">
 
   <!-- Header -->
-  <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 pb-4 border-b border-borderDark gap-3">
+  <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-5 pb-4 border-b border-slate-800 gap-3">
     <div class="flex items-center gap-3">
       <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-cyan-500 flex items-center justify-center shadow-lg shadow-emerald-500/20">
         <span class="text-white font-black text-sm">TP</span>
@@ -51,7 +60,7 @@
     </div>
     
     <div class="flex flex-wrap items-center gap-2">
-      <button onclick="toggleTheme()" id="theme-toggle-btn" class="text-xs bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 font-medium hover:bg-slate-700 transition flex items-center gap-1.5">
+      <button onclick="toggleTheme()" class="text-xs bg-slate-800 text-slate-200 px-3 py-1.5 rounded-lg border border-slate-700 font-medium hover:bg-slate-700 transition flex items-center gap-1.5">
         <span id="theme-icon">☀️</span> <span id="theme-text">Light Mode</span>
       </button>
       <button onclick="loadLiveSignals()" class="text-xs bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg font-medium transition">
@@ -64,31 +73,31 @@
   </header>
 
   <!-- Watchlist -->
-  <div class="mb-4 bg-cardDark p-3.5 rounded-2xl border border-borderDark card-shadow card-box">
-    <div class="flex justify-between items-center mb-2.5">
+  <div class="mb-4 bg-[#121824] p-3.5 rounded-2xl border border-slate-800 card-shadow card-box">
+    <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-2.5 gap-2">
       <div class="text-[11px] font-bold uppercase tracking-wider text-slate-400">Watchlist Quick-Switch</div>
       <button onclick="paperBuyCurrent()" class="text-[11px] bg-emerald-600/20 text-emerald-400 border border-emerald-600/40 px-2.5 py-1 rounded-lg hover:bg-emerald-600/30 transition">
         ➕ Paper Buy Current Chart
       </button>
     </div>
     <div class="flex gap-1.5 overflow-x-auto pb-1 text-xs" id="watchlist-bar">
-      <!-- populated by JS -->
+      <!-- filled by JS -->
     </div>
   </div>
 
   <!-- Performance Stats -->
-  <div class="mb-5 bg-cardDark p-4 rounded-2xl border border-borderDark card-shadow card-box">
+  <div class="mb-5 bg-[#121824] p-4 rounded-2xl border border-slate-800 card-shadow card-box">
     <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
       <div>
         <h2 class="text-sm font-bold uppercase tracking-wider text-emerald-400">Virtual Paper Trading</h2>
         <p class="text-xs text-slate-400 mt-0.5">1:2 Risk-Reward • Configurable Position Size</p>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-3">
         <select id="sizing-mode" onchange="updateSizingUI()" class="text-xs bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200">
           <option value="fixed">Fixed ₹10,000</option>
           <option value="risk">Risk % of Capital</option>
         </select>
-        <div id="risk-input-wrap" class="hidden">
+        <div id="risk-input-wrap" class="hidden flex items-center">
           <input id="risk-pct" type="number" value="1" min="0.5" max="5" step="0.5" class="w-16 text-xs bg-slate-800 border border-slate-700 rounded-lg px-2 py-1.5 text-slate-200" />
           <span class="text-xs text-slate-400 ml-1">%</span>
         </div>
@@ -128,10 +137,13 @@
   <div class="grid grid-cols-1 xl:grid-cols-3 gap-5">
 
     <!-- Chart -->
-    <div class="xl:col-span-2 bg-cardDark rounded-2xl border border-borderDark p-4 flex flex-col h-[540px] card-shadow card-box">
+    <div class="xl:col-span-2 bg-[#121824] rounded-2xl border border-slate-800 p-4 flex flex-col h-[540px] card-shadow card-box">
       <div class="flex justify-between items-center mb-3">
         <h2 id="chart-title" class="text-xs font-bold uppercase tracking-wider text-emerald-400 font-mono">BSE:RELIANCE</h2>
-        <span class="text-[10px] text-slate-400 font-mono">Live BSE Data</span>
+        <div class="flex items-center gap-2">
+          <span id="live-price" class="text-xs font-mono text-emerald-400">—</span>
+          <span class="text-[10px] text-slate-400 font-mono">Live</span>
+        </div>
       </div>
       <div class="flex-grow w-full rounded-xl overflow-hidden border border-slate-700/40 relative">
         <iframe id="tv-iframe"
@@ -144,7 +156,7 @@
     <div class="flex flex-col gap-5">
 
       <!-- AI Signals -->
-      <div class="bg-cardDark rounded-2xl border border-borderDark p-4 card-shadow card-box">
+      <div class="bg-[#121824] rounded-2xl border border-slate-800 p-4 card-shadow card-box">
         <div class="flex justify-between items-center mb-3">
           <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300">Live AI Signals</h2>
           <div class="flex items-center gap-2">
@@ -162,7 +174,7 @@
       </div>
 
       <!-- Sentiment -->
-      <div class="bg-cardDark rounded-2xl border border-borderDark p-4 h-[240px] flex flex-col card-shadow card-box">
+      <div class="bg-[#121824] rounded-2xl border border-slate-800 p-4 h-[240px] flex flex-col card-shadow card-box">
         <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 mb-2">Market Sentiment (NIFTY 50)</h2>
         <div class="flex-grow w-full overflow-hidden rounded-lg">
           <iframe id="gauge-iframe"
@@ -173,13 +185,13 @@
     </div>
   </div>
 
-  <!-- Equity Curve + Exposure -->
+  <!-- Equity + Exposure -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
-    <div class="lg:col-span-2 bg-cardDark rounded-2xl border border-borderDark p-4 card-shadow card-box">
+    <div class="lg:col-span-2 bg-[#121824] rounded-2xl border border-slate-800 p-4 card-shadow card-box">
       <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 mb-3">Equity Curve</h2>
       <canvas id="equityChart"></canvas>
     </div>
-    <div class="bg-cardDark rounded-2xl border border-borderDark p-4 card-shadow card-box">
+    <div class="bg-[#121824] rounded-2xl border border-slate-800 p-4 card-shadow card-box">
       <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 mb-3">Portfolio Exposure</h2>
       <div id="exposure-list" class="space-y-2 text-xs">
         <p class="text-slate-500 text-center py-8">No open positions</p>
@@ -188,7 +200,7 @@
   </div>
 
   <!-- Active Positions -->
-  <div class="mt-5 bg-cardDark rounded-2xl border border-borderDark p-4 card-shadow card-box">
+  <div class="mt-5 bg-[#121824] rounded-2xl border border-slate-800 p-4 card-shadow card-box">
     <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 mb-3">Active Paper Positions</h2>
     <div class="overflow-x-auto">
       <table class="w-full text-left text-xs">
@@ -210,8 +222,8 @@
     </div>
   </div>
 
-  <!-- Closed Trades History -->
-  <div class="mt-5 bg-cardDark rounded-2xl border border-borderDark p-4 card-shadow card-box">
+  <!-- Closed Trades -->
+  <div class="mt-5 bg-[#121824] rounded-2xl border border-slate-800 p-4 card-shadow card-box">
     <div class="flex justify-between items-center mb-3">
       <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200">Closed Trades History</h2>
       <span id="closed-count" class="text-xs text-slate-400">0 trades</span>
@@ -235,9 +247,9 @@
     </div>
   </div>
 
-  <!-- Risk Calculator Modal -->
+  <!-- Risk Modal -->
   <div id="risk-modal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
-    <div class="bg-cardDark border border-borderDark rounded-2xl p-5 w-full max-w-md card-shadow">
+    <div class="bg-[#121824] border border-slate-700 rounded-2xl p-5 w-full max-w-md card-shadow card-box">
       <h3 class="text-sm font-bold uppercase tracking-wider text-emerald-400 mb-4">Confirm Paper Trade</h3>
       <div class="space-y-3 text-sm">
         <div class="flex justify-between"><span class="text-slate-400">Symbol</span><span id="modal-symbol" class="font-mono font-bold"></span></div>
@@ -256,9 +268,9 @@
     </div>
   </div>
 
-  <!-- Close Trade Modal (with notes) -->
+  <!-- Close Modal -->
   <div id="close-modal" class="fixed inset-0 bg-black/60 z-50 hidden items-center justify-center p-4">
-    <div class="bg-cardDark border border-borderDark rounded-2xl p-5 w-full max-w-md card-shadow">
+    <div class="bg-[#121824] border border-slate-700 rounded-2xl p-5 w-full max-w-md card-shadow card-box">
       <h3 class="text-sm font-bold uppercase tracking-wider text-slate-200 mb-4">Close Trade</h3>
       <div class="space-y-3">
         <div>
@@ -281,30 +293,31 @@
   </div>
 
   <script>
-    // ========== STATE ==========
+    // ===================== STATE =====================
     let currentTheme = localStorage.getItem('theme') || 'dark';
     let currentSymbol = 'BSE:RELIANCE';
     let pendingTrade = null;
     let closingTradeId = null;
     let lastSignalIds = new Set();
     let equityChart = null;
+    let priceCache = {}; // { 'RELIANCE': 1308.00 }
 
     const WATCHLIST = [
-      { symbol: 'BSE:RELIANCE', name: 'RELIANCE' },
-      { symbol: 'BSE:TCS', name: 'TCS' },
-      { symbol: 'BSE:INFY', name: 'INFY' },
-      { symbol: 'BSE:HDFCBANK', name: 'HDFCBANK' },
-      { symbol: 'BSE:ICICIBANK', name: 'ICICI' },
-      { symbol: 'BSE:SBIN', name: 'SBIN' },
-      { symbol: 'BSE:BHARTIARTL', name: 'AIRTEL' },
-      { symbol: 'BSE:ITC', name: 'ITC' },
-      { symbol: 'BSE:LT', name: 'LT' },
-      { symbol: 'BSE:TATAMOTORS', name: 'TATAMOTORS' },
-      { symbol: 'BSE:BAJFINANCE', name: 'BAJAJ-FIN' },
-      { symbol: 'BSE:MARUTI', name: 'MARUTI' },
-      { symbol: 'BSE:AXISBANK', name: 'AXIS' },
-      { symbol: 'BSE:SUNPHARMA', name: 'SUNPHARMA' },
-      { symbol: 'BSE:KOTAKBANK', name: 'KOTAK' }
+      { symbol: 'BSE:RELIANCE', yahoo: 'RELIANCE.NS', name: 'RELIANCE' },
+      { symbol: 'BSE:TCS', yahoo: 'TCS.NS', name: 'TCS' },
+      { symbol: 'BSE:INFY', yahoo: 'INFY.NS', name: 'INFY' },
+      { symbol: 'BSE:HDFCBANK', yahoo: 'HDFCBANK.NS', name: 'HDFCBANK' },
+      { symbol: 'BSE:ICICIBANK', yahoo: 'ICICIBANK.NS', name: 'ICICI' },
+      { symbol: 'BSE:SBIN', yahoo: 'SBIN.NS', name: 'SBIN' },
+      { symbol: 'BSE:BHARTIARTL', yahoo: 'BHARTIARTL.NS', name: 'AIRTEL' },
+      { symbol: 'BSE:ITC', yahoo: 'ITC.NS', name: 'ITC' },
+      { symbol: 'BSE:LT', yahoo: 'LT.NS', name: 'LT' },
+      { symbol: 'BSE:TATAMOTORS', yahoo: 'TATAMOTORS.NS', name: 'TATAMOTORS' },
+      { symbol: 'BSE:BAJFINANCE', yahoo: 'BAJFINANCE.NS', name: 'BAJAJ-FIN' },
+      { symbol: 'BSE:MARUTI', yahoo: 'MARUTI.NS', name: 'MARUTI' },
+      { symbol: 'BSE:AXISBANK', yahoo: 'AXISBANK.NS', name: 'AXIS' },
+      { symbol: 'BSE:SUNPHARMA', yahoo: 'SUNPHARMA.NS', name: 'SUNPHARMA' },
+      { symbol: 'BSE:KOTAKBANK', yahoo: 'KOTAKBANK.NS', name: 'KOTAK' }
     ];
 
     let paperState = JSON.parse(localStorage.getItem('tradePulsePaperStateV2')) || {
@@ -317,37 +330,41 @@
 
     let signalsCache = [];
 
-    // ========== THEME ==========
+    // ===================== THEME =====================
     function applyTheme(theme) {
       currentTheme = theme;
       localStorage.setItem('theme', theme);
-      const isDark = theme === 'dark';
-      const body = document.body;
+      const html = document.documentElement;
       const themeText = document.getElementById('theme-text');
       const themeIcon = document.getElementById('theme-icon');
 
-      if (isDark) {
-        body.className = 'bg-[#0b0e14] text-slate-100 p-3 md:p-5 font-sans';
-        document.querySelectorAll('.card-box').forEach(el => {
-          el.style.backgroundColor = '#121824';
-          el.style.borderColor = '#1e293b';
-        });
+      if (theme === 'dark') {
+        html.classList.add('dark');
+        html.classList.remove('light');
+        document.body.className = 'bg-[#0b0e14] text-slate-100 transition-colors duration-200 p-3 md:p-5 font-sans';
         themeText.innerText = 'Light Mode';
         themeIcon.innerText = '☀️';
-        document.documentElement.classList.add('dark');
-        document.documentElement.classList.remove('light');
       } else {
-        body.className = 'bg-[#f1f5f9] text-slate-900 p-3 md:p-5 font-sans light';
-        document.querySelectorAll('.card-box').forEach(el => {
-          el.style.backgroundColor = '#ffffff';
-          el.style.borderColor = '#e2e8f0';
-        });
+        html.classList.remove('dark');
+        html.classList.add('light');
+        document.body.className = 'bg-[#f1f5f9] text-slate-900 transition-colors duration-200 p-3 md:p-5 font-sans';
         themeText.innerText = 'Dark Mode';
         themeIcon.innerText = '🌙';
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
       }
+
+      // Force re-style cards
+      document.querySelectorAll('.card-box').forEach(el => {
+        if (theme === 'dark') {
+          el.style.backgroundColor = '#121824';
+          el.style.borderColor = '#1e293b';
+        } else {
+          el.style.backgroundColor = '#ffffff';
+          el.style.borderColor = '#e2e8f0';
+        }
+      });
+
       loadChart(currentSymbol);
+      renderWatchlist();
       if (equityChart) updateEquityChart();
     }
 
@@ -355,7 +372,64 @@
       applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
     }
 
-    // ========== CHART ==========
+    // ===================== PRICE API (Yahoo Finance) =====================
+    async function fetchPrice(yahooSymbol) {
+      try {
+        // Direct Yahoo endpoint (may face CORS on some browsers)
+        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=1d`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('Network');
+        const data = await res.json();
+        const result = data.chart?.result?.[0];
+        if (!result) throw new Error('No data');
+        const price = result.meta?.regularMarketPrice || result.meta?.previousClose;
+        if (price) {
+          priceCache[yahooSymbol] = price;
+          return price;
+        }
+      } catch (e) {
+        // Fallback: try a public CORS proxy (for demo only)
+        try {
+          const proxyUrl = `https://corsproxy.io/?${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + yahooSymbol + '?interval=1d&range=1d')}`;
+          const res2 = await fetch(proxyUrl);
+          const data2 = await res2.json();
+          const result2 = data2.chart?.result?.[0];
+          const price2 = result2?.meta?.regularMarketPrice || result2?.meta?.previousClose;
+          if (price2) {
+            priceCache[yahooSymbol] = price2;
+            return price2;
+          }
+        } catch (e2) {
+          console.log('Price fetch failed for', yahooSymbol);
+        }
+      }
+      return null;
+    }
+
+    async function updateLivePrice() {
+      const item = WATCHLIST.find(w => w.symbol === currentSymbol);
+      if (!item) return;
+      const price = await fetchPrice(item.yahoo);
+      const el = document.getElementById('live-price');
+      if (price) {
+        el.innerText = `₹${price.toFixed(2)}`;
+        el.className = 'text-xs font-mono text-emerald-400';
+      } else {
+        el.innerText = 'Price N/A';
+        el.className = 'text-xs font-mono text-slate-500';
+      }
+    }
+
+    async function refreshAllWatchlistPrices() {
+      // Fetch a few key ones to avoid rate limits
+      for (const w of WATCHLIST.slice(0, 8)) {
+        await fetchPrice(w.yahoo);
+        await new Promise(r => setTimeout(r, 300)); // gentle delay
+      }
+      renderWatchlist();
+    }
+
+    // ===================== CHART =====================
     function loadChart(symbol) {
       currentSymbol = symbol;
       document.getElementById('chart-title').innerText = symbol;
@@ -364,23 +438,39 @@
       const bgParam = currentTheme === 'dark' ? '121824' : 'ffffff';
       document.getElementById('tv-iframe').src =
         `https://s.tradingview.com/widgetembed/?symbol=\( {encoded}&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg= \){bgParam}&studies=%5B%5D&theme=${themeParam}&style=1&timezone=Asia%2FKolkata&withdateranges=1&showpopupbutton=1`;
+      
+      // Update gauge theme too
+      const gaugeTheme = currentTheme === 'dark' ? 'dark' : 'light';
+      document.getElementById('gauge-iframe').src =
+        `https://s.tradingview.com/embed-widget/technical-analysis/?locale=en#%7B%22interval%22%3A%221D%22%2C%22width%22%3A%22100%25%22%2C%22isTransparent%22%3Atrue%2C%22height%22%3A%22100%25%22%2C%22symbol%22%3A%22NSE%3ANIFTY%22%2C%22showIntervalTabs%22%3Atrue%2C%22displayMode%22%3A%22single%22%2C%22colorTheme%22%3A%22${gaugeTheme}%22%7D`;
+
       renderWatchlist();
+      updateLivePrice();
     }
 
-    // ========== WATCHLIST ==========
+    // ===================== WATCHLIST =====================
     function renderWatchlist() {
       const bar = document.getElementById('watchlist-bar');
+      if (!bar) return;
+
       bar.innerHTML = WATCHLIST.map(w => {
         const active = currentSymbol === w.symbol;
-        return `<button onclick="loadChart('${w.symbol}')" 
-          class="stock-btn px-2.5 py-1.5 rounded-lg shrink-0 font-mono text-xs transition
-          ${active ? 'bg-emerald-600 text-white shadow-md shadow-emerald-600/30' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'}">
-          ${w.name}
-        </button>`;
+        const price = priceCache[w.yahoo];
+        const priceText = price ? `₹${price.toFixed(0)}` : '';
+
+        return `
+          <button onclick="loadChart('${w.symbol}')" 
+            class="stock-btn px-2.5 py-1.5 rounded-lg shrink-0 font-mono text-xs transition border
+            ${active 
+              ? 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-600/30' 
+              : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700'}">
+            ${w.name}
+            \( {priceText ? `<span class="opacity-70 ml-1 text-[10px]"> \){priceText}</span>` : ''}
+          </button>`;
       }).join('');
     }
 
-    // ========== SIZING ==========
+    // ===================== SIZING =====================
     function updateSizingUI() {
       const mode = document.getElementById('sizing-mode').value;
       document.getElementById('risk-input-wrap').classList.toggle('hidden', mode !== 'risk');
@@ -388,23 +478,23 @@
 
     function calcPositionSize(price) {
       const mode = document.getElementById('sizing-mode').value;
-      if (mode === 'fixed') {
-        return 10000;
-      } else {
-        const riskPct = parseFloat(document.getElementById('risk-pct').value) || 1;
-        const riskAmount = paperState.balance * (riskPct / 100);
-        // 5% stop → position size = riskAmount / 0.05
-        return Math.max(1000, riskAmount / 0.05);
-      }
+      if (mode === 'fixed') return 10000;
+      const riskPct = parseFloat(document.getElementById('risk-pct').value) || 1;
+      const riskAmount = paperState.balance * (riskPct / 100);
+      return Math.max(1000, riskAmount / 0.05);
     }
 
-    // ========== PAPER TRADING ==========
+    // ===================== PAPER TRADING =====================
     function savePaperState() {
       localStorage.setItem('tradePulsePaperStateV2', JSON.stringify(paperState));
       renderAll();
     }
 
     function openPaperTradeModal(ticker, price) {
+      if (!price || price <= 0) {
+        alert('Invalid price. Try again after price loads.');
+        return;
+      }
       const size = calcPositionSize(price);
       const qty = Math.max(1, Math.floor(size / price));
       const target = Math.round(price * 1.10 * 100) / 100;
@@ -415,7 +505,7 @@
       pendingTrade = { ticker, price, qty, target, stopLoss, size, riskAmt, rewardAmt };
 
       document.getElementById('modal-symbol').innerText = ticker;
-      document.getElementById('modal-price').innerText = `₹${price}`;
+      document.getElementById('modal-price').innerText = `₹${price.toFixed(2)}`;
       document.getElementById('modal-size').innerText = `₹${Math.round(size).toLocaleString('en-IN')}`;
       document.getElementById('modal-qty').innerText = `${qty} shares`;
       document.getElementById('modal-target').innerText = `₹${target}`;
@@ -452,12 +542,19 @@
       closeRiskModal();
     }
 
-    function paperBuyCurrent() {
-      // Use a placeholder price – in real use you would fetch live price
-      const clean = currentSymbol.replace('BSE:', '');
-      const dummyPrice = 1000; // replace with real price later
-      openPaperTradeModal(clean, dummyPrice);
-      alert('Using placeholder price ₹1000. Connect a live price API for accurate entries.');
+    async function paperBuyCurrent() {
+      const item = WATCHLIST.find(w => w.symbol === currentSymbol);
+      if (!item) return;
+
+      let price = priceCache[item.yahoo];
+      if (!price) {
+        price = await fetchPrice(item.yahoo);
+      }
+      if (!price) {
+        alert('Could not fetch live price. Please try again in a few seconds or use a signal price.');
+        return;
+      }
+      openPaperTradeModal(item.name, price);
     }
 
     function openCloseModal(id) {
@@ -524,7 +621,7 @@
       }
     }
 
-    // ========== RENDER ==========
+    // ===================== RENDER =====================
     function renderAll() {
       renderPaperStats();
       renderOpenTrades();
@@ -544,7 +641,6 @@
       const grossLoss = Math.abs(losses.reduce((s, t) => s + t.pnl, 0));
       const pf = grossLoss > 0 ? (grossProfit / grossLoss).toFixed(2) : (grossProfit > 0 ? '∞' : '—');
 
-      // Max Drawdown
       let peak = paperState.initialBalance;
       let maxDD = 0;
       paperState.equityHistory.forEach(h => {
@@ -574,7 +670,7 @@
       tbody.innerHTML = paperState.openTrades.map(t => `
         <tr class="hover:bg-slate-800/40">
           <td class="p-2.5 font-bold font-mono text-emerald-400">${t.ticker}</td>
-          <td class="p-2.5 font-mono">₹${t.entryPrice}</td>
+          <td class="p-2.5 font-mono">₹${t.entryPrice.toFixed(2)}</td>
           <td class="p-2.5 font-mono text-emerald-400">₹${t.target}</td>
           <td class="p-2.5 font-mono text-rose-400">₹${t.stopLoss}</td>
           <td class="p-2.5 font-mono">${t.qty}</td>
@@ -597,7 +693,7 @@
         return `
           <tr class="hover:bg-slate-800/30">
             <td class="p-2.5 font-mono font-bold">${t.ticker}</td>
-            <td class="p-2.5 font-mono text-slate-400">₹\( {t.entryPrice} → ₹ \){t.closeOutcome === 'TARGET' ? t.target : t.stopLoss}</td>
+            <td class="p-2.5 font-mono text-slate-400">₹\( {t.entryPrice.toFixed(2)} → ₹ \){t.closeOutcome === 'TARGET' ? t.target : t.stopLoss}</td>
             <td class="p-2.5"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold \( {isWin ? 'bg-emerald-900/60 text-emerald-400' : 'bg-rose-900/60 text-rose-400'}"> \){t.closeOutcome}</span></td>
             <td class="p-2.5 font-mono font-bold \( {isWin ? 'text-emerald-400' : 'text-rose-400'}"> \){isWin ? '+' : ''}₹${Math.round(t.pnl)}</td>
             <td class="p-2.5 text-slate-500">${t.closeTime.split(',')[0]}</td>
@@ -635,7 +731,9 @@
     }
 
     function updateEquityChart() {
-      const ctx = document.getElementById('equityChart').getContext('2d');
+      const canvas = document.getElementById('equityChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
       const labels = paperState.equityHistory.map((_, i) => i === 0 ? 'Start' : `T${i}`);
       const data = paperState.equityHistory.map(h => h.balance);
 
@@ -667,7 +765,7 @@
       });
     }
 
-    // ========== SIGNALS ==========
+    // ===================== SIGNALS =====================
     async function loadLiveSignals() {
       try {
         const res = await fetch('./signals.json?t=' + Date.now());
@@ -682,8 +780,8 @@
       } catch (e) {
         document.getElementById('signal-feed').innerHTML = `
           <p class="text-xs text-slate-500 py-4 text-center">
-            No signals.json found or empty.<br>
-            Place a signals.json file next to this HTML to see live AI signals.
+            No signals.json found.<br>
+            Place a signals.json file next to this HTML.
           </p>`;
       }
     }
@@ -729,20 +827,18 @@
       if (newBuys.length && Notification.permission === 'granted') {
         newBuys.forEach(s => {
           new Notification('TradePulse – New BUY', {
-            body: `\( {s.ticker} @ ₹ \){s.price} | RSI ${s.rsi}`,
-            icon: '/favicon.ico'
+            body: `\( {s.ticker} @ ₹ \){s.price} | RSI ${s.rsi}`
           });
         });
       }
       lastSignalIds = new Set(signals.map(s => s.ticker + s.time));
     }
 
-    // Request notification permission once
     if ('Notification' in window && Notification.permission === 'default') {
       Notification.requestPermission();
     }
 
-    // ========== EXPORT ==========
+    // ===================== EXPORT =====================
     function exportTradesCSV() {
       if (paperState.closedTrades.length === 0) {
         alert('No closed trades to export.');
@@ -770,14 +866,17 @@
       URL.revokeObjectURL(url);
     }
 
-    // ========== INIT ==========
+    // ===================== INIT =====================
     applyTheme(currentTheme);
     renderWatchlist();
     renderAll();
     loadLiveSignals();
     updateSizingUI();
+    updateLivePrice();
 
-    // Auto-refresh signals every 60s
+    // Refresh prices periodically
+    setTimeout(refreshAllWatchlistPrices, 2000);
+    setInterval(updateLivePrice, 60000);
     setInterval(loadLiveSignals, 60000);
   </script>
 </body>
