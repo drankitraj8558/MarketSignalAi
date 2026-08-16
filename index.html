@@ -189,7 +189,9 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 mt-5">
     <div class="lg:col-span-2 bg-[#121824] rounded-2xl border border-slate-800 p-4 card-shadow card-box">
       <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 mb-3">Equity Curve</h2>
-      <canvas id="equityChart"></canvas>
+      <div class="h-[200px]">
+        <canvas id="equityChart"></canvas>
+      </div>
     </div>
     <div class="bg-[#121824] rounded-2xl border border-slate-800 p-4 card-shadow card-box">
       <h2 class="text-sm font-bold uppercase tracking-wider text-slate-200 mb-3">Portfolio Exposure</h2>
@@ -300,7 +302,7 @@
     let closingTradeId = null;
     let lastSignalIds = new Set();
     let equityChart = null;
-    let priceCache = {}; // { 'RELIANCE': 1308.00 }
+    let priceCache = {};
 
     const WATCHLIST = [
       { symbol: 'BSE:RELIANCE', yahoo: 'RELIANCE.NS', name: 'RELIANCE' },
@@ -352,7 +354,6 @@
         themeIcon.innerText = '🌙';
       }
 
-      // Force re-style cards
       document.querySelectorAll('.card-box').forEach(el => {
         if (theme === 'dark') {
           el.style.backgroundColor = '#121824';
@@ -372,38 +373,29 @@
       applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
     }
 
-    // ===================== PRICE API (Yahoo Finance) =====================
+    // ===================== PRICE API =====================
     async function fetchPrice(yahooSymbol) {
+      // Check signalsCache first
+      const foundInCache = signalsCache.find(s => s.ticker === yahooSymbol);
+      if (foundInCache && foundInCache.price) {
+        priceCache[yahooSymbol] = foundInCache.price;
+        return foundInCache.price;
+      }
+
       try {
-        // Direct Yahoo endpoint (may face CORS on some browsers)
-        const url = `https://query1.finance.yahoo.com/v8/finance/chart/${yahooSymbol}?interval=1d&range=1d`;
-        const res = await fetch(url);
-        if (!res.ok) throw new Error('Network');
+        const proxyUrl = `https://corsproxy.io/?${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + yahooSymbol + '?interval=1d&range=1d')}`;
+        const res = await fetch(proxyUrl);
         const data = await res.json();
         const result = data.chart?.result?.[0];
-        if (!result) throw new Error('No data');
-        const price = result.meta?.regularMarketPrice || result.meta?.previousClose;
+        const price = result?.meta?.regularMarketPrice || result?.meta?.previousClose;
         if (price) {
           priceCache[yahooSymbol] = price;
           return price;
         }
       } catch (e) {
-        // Fallback: try a public CORS proxy (for demo only)
-        try {
-          const proxyUrl = `https://corsproxy.io/?${encodeURIComponent('https://query1.finance.yahoo.com/v8/finance/chart/' + yahooSymbol + '?interval=1d&range=1d')}`;
-          const res2 = await fetch(proxyUrl);
-          const data2 = await res2.json();
-          const result2 = data2.chart?.result?.[0];
-          const price2 = result2?.meta?.regularMarketPrice || result2?.meta?.previousClose;
-          if (price2) {
-            priceCache[yahooSymbol] = price2;
-            return price2;
-          }
-        } catch (e2) {
-          console.log('Price fetch failed for', yahooSymbol);
-        }
+        console.log('Price fallback active for', yahooSymbol);
       }
-      return null;
+      return priceCache[yahooSymbol] || null;
     }
 
     async function updateLivePrice() {
@@ -421,10 +413,8 @@
     }
 
     async function refreshAllWatchlistPrices() {
-      // Fetch a few key ones to avoid rate limits
       for (const w of WATCHLIST.slice(0, 8)) {
         await fetchPrice(w.yahoo);
-        await new Promise(r => setTimeout(r, 300)); // gentle delay
       }
       renderWatchlist();
     }
@@ -437,9 +427,8 @@
       const themeParam = currentTheme === 'dark' ? 'dark' : 'light';
       const bgParam = currentTheme === 'dark' ? '121824' : 'ffffff';
       document.getElementById('tv-iframe').src =
-        `https://s.tradingview.com/widgetembed/?symbol=\( {encoded}&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg= \){bgParam}&studies=%5B%5D&theme=${themeParam}&style=1&timezone=Asia%2FKolkata&withdateranges=1&showpopupbutton=1`;
+        `https://s.tradingview.com/widgetembed/?symbol=${encoded}&interval=D&hidesidetoolbar=0&symboledit=1&saveimage=1&toolbarbg=${bgParam}&studies=%5B%5D&theme=${themeParam}&style=1&timezone=Asia%2FKolkata&withdateranges=1&showpopupbutton=1`;
       
-      // Update gauge theme too
       const gaugeTheme = currentTheme === 'dark' ? 'dark' : 'light';
       document.getElementById('gauge-iframe').src =
         `https://s.tradingview.com/embed-widget/technical-analysis/?locale=en#%7B%22interval%22%3A%221D%22%2C%22width%22%3A%22100%25%22%2C%22isTransparent%22%3Atrue%2C%22height%22%3A%22100%25%22%2C%22symbol%22%3A%22NSE%3ANIFTY%22%2C%22showIntervalTabs%22%3Atrue%2C%22displayMode%22%3A%22single%22%2C%22colorTheme%22%3A%22${gaugeTheme}%22%7D`;
@@ -465,7 +454,7 @@
               ? 'bg-emerald-600 text-white border-emerald-500 shadow-md shadow-emerald-600/30' 
               : 'bg-slate-800 text-slate-200 border-slate-700 hover:bg-slate-700'}">
             ${w.name}
-            \( {priceText ? `<span class="opacity-70 ml-1 text-[10px]"> \){priceText}</span>` : ''}
+            ${priceText ? `<span class="opacity-70 ml-1 text-[10px]">${priceText}</span>` : ''}
           </button>`;
       }).join('');
     }
@@ -551,7 +540,7 @@
         price = await fetchPrice(item.yahoo);
       }
       if (!price) {
-        alert('Could not fetch live price. Please try again in a few seconds or use a signal price.');
+        alert('Price unavailable. Please wait for signals to sync.');
         return;
       }
       openPaperTradeModal(item.name, price);
@@ -651,10 +640,10 @@
 
       document.getElementById('stat-balance').innerText = `₹${Math.round(paperState.balance).toLocaleString('en-IN')}`;
       const pnlEl = document.getElementById('stat-pnl');
-      pnlEl.innerText = `\( {totalPnl >= 0 ? '+' : ''}₹ \){Math.round(totalPnl).toLocaleString('en-IN')}`;
+      pnlEl.innerText = `${totalPnl >= 0 ? '+' : ''}₹${Math.round(totalPnl).toLocaleString('en-IN')}`;
       pnlEl.className = `text-base font-mono font-bold mt-0.5 ${totalPnl >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
 
-      document.getElementById('stat-winrate').innerText = `\( {winRate}% ( \){wins.length}/${closed.length})`;
+      document.getElementById('stat-winrate').innerText = `${winRate}% (${wins.length}/${closed.length})`;
       document.getElementById('stat-pf').innerText = pf;
       document.getElementById('stat-dd').innerText = `${maxDD.toFixed(1)}%`;
       document.getElementById('stat-open-count').innerText = paperState.openTrades.length;
@@ -693,11 +682,11 @@
         return `
           <tr class="hover:bg-slate-800/30">
             <td class="p-2.5 font-mono font-bold">${t.ticker}</td>
-            <td class="p-2.5 font-mono text-slate-400">₹\( {t.entryPrice.toFixed(2)} → ₹ \){t.closeOutcome === 'TARGET' ? t.target : t.stopLoss}</td>
-            <td class="p-2.5"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold \( {isWin ? 'bg-emerald-900/60 text-emerald-400' : 'bg-rose-900/60 text-rose-400'}"> \){t.closeOutcome}</span></td>
-            <td class="p-2.5 font-mono font-bold \( {isWin ? 'text-emerald-400' : 'text-rose-400'}"> \){isWin ? '+' : ''}₹${Math.round(t.pnl)}</td>
+            <td class="p-2.5 font-mono text-slate-400">₹${t.entryPrice.toFixed(2)} → ₹${t.closeOutcome === 'TARGET' ? t.target : t.stopLoss}</td>
+            <td class="p-2.5"><span class="px-1.5 py-0.5 rounded text-[10px] font-bold ${isWin ? 'bg-emerald-900/60 text-emerald-400' : 'bg-rose-900/60 text-rose-400'}">${t.closeOutcome}</span></td>
+            <td class="p-2.5 font-mono font-bold ${isWin ? 'text-emerald-400' : 'text-rose-400'}">${isWin ? '+' : ''}₹${Math.round(t.pnl)}</td>
             <td class="p-2.5 text-slate-500">${t.closeTime.split(',')[0]}</td>
-            <td class="p-2.5 text-slate-400 max-w-[180px] truncate" title="\( {t.note || ''}"> \){t.note || '—'}</td>
+            <td class="p-2.5 text-slate-400 max-w-[180px] truncate" title="${t.note || ''}">${t.note || '—'}</td>
           </tr>
         `;
       }).join('');
@@ -806,14 +795,14 @@
         return `
           <div class="signal-card p-3 bg-slate-900/70 hover:bg-slate-800/80 border-l-4 ${border} rounded-r-xl">
             <div class="flex justify-between items-center text-xs font-bold">
-              <span onclick="loadChart('BSE:\( {clean}')" class=" \){badge} px-2 py-0.5 rounded font-mono cursor-pointer">
+              <span onclick="loadChart('BSE:${clean}')" class="${badge} px-2 py-0.5 rounded font-mono cursor-pointer">
                 ${isBuy ? '🟢 BUY' : '🔴 EXIT'}: ${clean}
               </span>
               <span class="text-slate-500 font-normal text-[10px]">${(s.time || '').split(',')[1] || s.time || ''}</span>
             </div>
             <div class="flex justify-between items-center text-[11px] text-slate-300 font-mono mt-1.5">
               <span>₹${s.price} • RSI ${s.rsi}</span>
-              \( {isBuy ? `<button onclick="openPaperTradeModal(' \){clean}', ${s.price})" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold">➕ Paper Buy</button>` : ''}
+              ${isBuy ? `<button onclick="openPaperTradeModal('${clean}', ${s.price})" class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded text-[10px] font-bold">➕ Paper Buy</button>` : ''}
             </div>
             <p class="text-[11px] text-slate-400 mt-1 leading-snug">${s.analysis || ''}</p>
           </div>
@@ -827,7 +816,7 @@
       if (newBuys.length && Notification.permission === 'granted') {
         newBuys.forEach(s => {
           new Notification('TradePulse – New BUY', {
-            body: `\( {s.ticker} @ ₹ \){s.price} | RSI ${s.rsi}`
+            body: `${s.ticker} @ ₹${s.price} | RSI ${s.rsi}`
           });
         });
       }
@@ -874,7 +863,6 @@
     updateSizingUI();
     updateLivePrice();
 
-    // Refresh prices periodically
     setTimeout(refreshAllWatchlistPrices, 2000);
     setInterval(updateLivePrice, 60000);
     setInterval(loadLiveSignals, 60000);
