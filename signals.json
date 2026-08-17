@@ -1,32 +1,23 @@
 {
-  "last_updated": "17 Aug 2026, 10:38 AM IST",
+  "last_updated": "17 Aug 2026, 04:18 PM IST",
   "signals": [
-    {
-      "ticker": "HDFCBANK.NS",
-      "type": "EXIT",
-      "price": 725.45,
-      "rsi": 41.81,
-      "indicators": "MACD: Bearish | Vol: Normal",
-      "time": "17 Aug 2026, 10:38 AM IST",
-      "analysis": "EXIT trigger active at \u20b9725.45 (RSI: 41.81)."
-    },
     {
       "ticker": "ITC.NS",
       "type": "EXIT",
-      "price": 276.05,
-      "rsi": 36.93,
+      "price": 273.05,
+      "rsi": 33.84,
       "indicators": "MACD: Bearish | Vol: Normal",
-      "time": "17 Aug 2026, 10:38 AM IST",
-      "analysis": "EXIT trigger active at \u20b9276.05 (RSI: 36.93)."
+      "time": "17 Aug 2026, 04:18 PM IST",
+      "analysis": "EXIT trigger active at \u20b9273.05 (RSI: 33.84)."
     },
     {
       "ticker": "LT.NS",
       "type": "EXIT",
-      "price": 4028.9,
-      "rsi": 70.42,
+      "price": 4086.7,
+      "rsi": 76.33,
       "indicators": "MACD: Bullish Crossover | Vol: Normal",
-      "time": "17 Aug 2026, 10:38 AM IST",
-      "analysis": "EXIT trigger active at \u20b94028.9 (RSI: 70.42)."
+      "time": "17 Aug 2026, 04:18 PM IST",
+      "analysis": "EXIT trigger active at \u20b94086.7 (RSI: 76.33)."
     }
   ]
 }
