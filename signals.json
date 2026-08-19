@@ -1,41 +1,50 @@
 {
-  "last_updated": "18 Aug 2026, 04:17 PM IST",
+  "last_updated": "19 Aug 2026, 10:32 AM IST",
   "signals": [
     {
       "ticker": "TCS.NS",
       "type": "EXIT",
-      "price": 2280.0,
-      "rsi": 36.84,
+      "price": 2262.6,
+      "rsi": 36.69,
       "indicators": "MACD: Bearish | Vol: Normal",
-      "time": "18 Aug 2026, 04:17 PM IST",
-      "analysis": "EXIT trigger active at \u20b92280.0 (RSI: 36.84)."
+      "time": "19 Aug 2026, 10:32 AM IST",
+      "analysis": "EXIT trigger active at \u20b92262.6 (RSI: 36.69)."
     },
     {
       "ticker": "INFY.NS",
       "type": "EXIT",
-      "price": 1115.0,
-      "rsi": 40.09,
+      "price": 1116.8,
+      "rsi": 40.61,
       "indicators": "MACD: Bearish | Vol: Normal",
-      "time": "18 Aug 2026, 04:17 PM IST",
-      "analysis": "EXIT trigger active at \u20b91115.0 (RSI: 40.09)."
+      "time": "19 Aug 2026, 10:32 AM IST",
+      "analysis": "EXIT trigger active at \u20b91116.8 (RSI: 40.61)."
     },
     {
       "ticker": "HDFCBANK.NS",
       "type": "EXIT",
-      "price": 723.0,
-      "rsi": 26.84,
+      "price": 716.5,
+      "rsi": 16.05,
       "indicators": "MACD: Bearish | Vol: Normal",
-      "time": "18 Aug 2026, 04:17 PM IST",
-      "analysis": "EXIT trigger active at \u20b9723.0 (RSI: 26.84)."
+      "time": "19 Aug 2026, 10:32 AM IST",
+      "analysis": "EXIT trigger active at \u20b9716.5 (RSI: 16.05)."
     },
     {
       "ticker": "ITC.NS",
       "type": "EXIT",
-      "price": 270.0,
-      "rsi": 28.25,
+      "price": 268.55,
+      "rsi": 28.06,
       "indicators": "MACD: Bearish | Vol: Normal",
-      "time": "18 Aug 2026, 04:17 PM IST",
-      "analysis": "EXIT trigger active at \u20b9270.0 (RSI: 28.25)."
+      "time": "19 Aug 2026, 10:32 AM IST",
+      "analysis": "EXIT trigger active at \u20b9268.55 (RSI: 28.06)."
+    },
+    {
+      "ticker": "MARUTI.NS",
+      "type": "EXIT",
+      "price": 13692.0,
+      "rsi": 30.31,
+      "indicators": "MACD: Bearish | Vol: Normal",
+      "time": "19 Aug 2026, 10:32 AM IST",
+      "analysis": "EXIT trigger active at \u20b913692.0 (RSI: 30.31)."
     }
   ]
 }
