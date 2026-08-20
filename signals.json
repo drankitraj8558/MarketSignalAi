@@ -1,32 +1,32 @@
 {
-  "last_updated": "20 Aug 2026, 10:34 AM IST",
+  "last_updated": "20 Aug 2026, 04:17 PM IST",
   "signals": [
     {
       "ticker": "HDFCBANK.NS",
       "type": "EXIT",
-      "price": 727.15,
-      "rsi": 30.19,
+      "price": 725.05,
+      "rsi": 27.31,
       "indicators": "MACD: Bullish Crossover | Vol: Normal",
-      "time": "20 Aug 2026, 10:34 AM IST",
-      "analysis": "EXIT trigger active at \u20b9727.15 (RSI: 30.19)."
+      "time": "20 Aug 2026, 04:17 PM IST",
+      "analysis": "EXIT trigger active at \u20b9725.05 (RSI: 27.31)."
     },
     {
       "ticker": "ITC.NS",
       "type": "EXIT",
-      "price": 267.6,
-      "rsi": 31.18,
-      "indicators": "MACD: Bearish | Vol: Normal",
-      "time": "20 Aug 2026, 10:34 AM IST",
-      "analysis": "EXIT trigger active at \u20b9267.6 (RSI: 31.18)."
+      "price": 271.65,
+      "rsi": 38.21,
+      "indicators": "MACD: Bearish | Vol: \ud83d\udd25 High",
+      "time": "20 Aug 2026, 04:17 PM IST",
+      "analysis": "EXIT trigger active at \u20b9271.65 (RSI: 38.21)."
     },
     {
       "ticker": "MARUTI.NS",
       "type": "EXIT",
-      "price": 13729.0,
-      "rsi": 31.28,
+      "price": 13809.0,
+      "rsi": 37.2,
       "indicators": "MACD: Bearish | Vol: Normal",
-      "time": "20 Aug 2026, 10:34 AM IST",
-      "analysis": "EXIT trigger active at \u20b913729.0 (RSI: 31.28)."
+      "time": "20 Aug 2026, 04:17 PM IST",
+      "analysis": "EXIT trigger active at \u20b913809.0 (RSI: 37.2)."
     }
   ]
 }
