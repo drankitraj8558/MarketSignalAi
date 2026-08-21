@@ -1,32 +1,59 @@
 {
-  "last_updated": "20 Aug 2026, 04:17 PM IST",
+  "last_updated": "21 Aug 2026, 10:34 AM IST",
   "signals": [
+    {
+      "ticker": "TCS.NS",
+      "type": "EXIT",
+      "price": 2300.0,
+      "rsi": 31.27,
+      "indicators": "MACD: Bearish | Vol: Normal",
+      "time": "21 Aug 2026, 10:34 AM IST",
+      "analysis": "EXIT trigger active at \u20b92300.0 (RSI: 31.27)."
+    },
+    {
+      "ticker": "INFY.NS",
+      "type": "EXIT",
+      "price": 1132.5,
+      "rsi": 33.83,
+      "indicators": "MACD: Bearish | Vol: Normal",
+      "time": "21 Aug 2026, 10:34 AM IST",
+      "analysis": "EXIT trigger active at \u20b91132.5 (RSI: 33.83)."
+    },
     {
       "ticker": "HDFCBANK.NS",
       "type": "EXIT",
-      "price": 725.05,
-      "rsi": 27.31,
+      "price": 730.85,
+      "rsi": 28.64,
       "indicators": "MACD: Bullish Crossover | Vol: Normal",
-      "time": "20 Aug 2026, 04:17 PM IST",
-      "analysis": "EXIT trigger active at \u20b9725.05 (RSI: 27.31)."
+      "time": "21 Aug 2026, 10:34 AM IST",
+      "analysis": "EXIT trigger active at \u20b9730.85 (RSI: 28.64)."
     },
     {
       "ticker": "ITC.NS",
       "type": "EXIT",
-      "price": 271.65,
-      "rsi": 38.21,
-      "indicators": "MACD: Bearish | Vol: \ud83d\udd25 High",
-      "time": "20 Aug 2026, 04:17 PM IST",
-      "analysis": "EXIT trigger active at \u20b9271.65 (RSI: 38.21)."
+      "price": 270.15,
+      "rsi": 26.03,
+      "indicators": "MACD: Bearish | Vol: Normal",
+      "time": "21 Aug 2026, 10:34 AM IST",
+      "analysis": "EXIT trigger active at \u20b9270.15 (RSI: 26.03)."
     },
     {
       "ticker": "MARUTI.NS",
       "type": "EXIT",
-      "price": 13809.0,
-      "rsi": 37.2,
+      "price": 13706.0,
+      "rsi": 34.75,
       "indicators": "MACD: Bearish | Vol: Normal",
-      "time": "20 Aug 2026, 04:17 PM IST",
-      "analysis": "EXIT trigger active at \u20b913809.0 (RSI: 37.2)."
+      "time": "21 Aug 2026, 10:34 AM IST",
+      "analysis": "EXIT trigger active at \u20b913706.0 (RSI: 34.75)."
+    },
+    {
+      "ticker": "AXISBANK.NS",
+      "type": "EXIT",
+      "price": 1249.4,
+      "rsi": 41.24,
+      "indicators": "MACD: Bullish Crossover | Vol: Normal",
+      "time": "21 Aug 2026, 10:34 AM IST",
+      "analysis": "EXIT trigger active at \u20b91249.4 (RSI: 41.24)."
     }
   ]
 }
